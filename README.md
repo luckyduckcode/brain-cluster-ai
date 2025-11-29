@@ -43,6 +43,27 @@ ollama pull llama3.2:1b
 ollama serve
 ```
 
+### Desktop App (Recommended)
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch Chappy Desktop App
+./launch_chappy_desktop.sh  # Linux/Mac
+# or
+launch_chappy_desktop.bat   # Windows
+```
+
+### Web Interface
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch web interface
+python3 launch_chappy.py
+# Then open http://localhost:8501
+```
+
 ### Setup
 ```bash
 # Create virtual environment
@@ -76,6 +97,35 @@ pip install streamlit>=1.28.0
 # Launch Chappy's GUI
 python launch_chappy.py
 ```
+
+### 🖥️ Chappy Desktop App
+
+Run Chappy as a standalone desktop application with his own native window!
+
+**Features:**
+- Native desktop window (no browser required)
+- Auto-starts Chappy's brain server
+- Embedded web interface in desktop app
+- Cross-platform support (Linux, Mac, Windows)
+- Auto-prompt feature (Chappy thinks when idle)
+- Memory integration and live thought streaming
+
+**Quick Launch:**
+```bash
+# Linux/Mac
+./launch_chappy_desktop.sh
+
+# Windows
+launch_chappy_desktop.bat
+
+# Or directly
+python3 chappy_desktop.py
+```
+
+**System Requirements:**
+- Python 3.8+
+- Ollama running with llama3.2:1b model
+- Desktop environment (X11, Wayland, or Windows)
 
 **Features:**
 - 🗣️ **Real-time chat** with Chappy
