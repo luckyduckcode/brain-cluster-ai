@@ -69,6 +69,28 @@ class WeightLearner:
         # Auto-save
         self._save_weights()
     
+    def update_contributing_neurons(self, neuron_names: List[str], score: float, 
+                                   learning_rate: float = 0.1):
+        """
+        Update weights for multiple neurons that contributed to a decision.
+        
+        Implements temporal credit assignment - all neurons in the winning
+        cluster share the credit/blame proportionally.
+        
+        Args:
+            neuron_names: List of neuron names that contributed to the decision
+            score: Outcome score (-1.0 to 1.0) 
+            learning_rate: How fast to adapt (0.0 to 1.0)
+        """
+        if not neuron_names:
+            logger.warning("No neurons provided for update")
+            return
+            
+        # Each contributing neuron gets the full score (they all contributed equally)
+        # In more sophisticated implementations, this could be weighted by confidence
+        for neuron_name in neuron_names:
+            self.update(neuron_name, score, learning_rate)
+    
     def get_weight(self, neuron_name: str) -> float:
         """Get current weight for a neuron."""
         return self.weights.get(neuron_name, 1.0)
