@@ -1,0 +1,238 @@
+# AGI Architecture: Execution Plan
+
+## Core Vision
+Building a modular AGI system using local LLMs where:
+- **Specialized Neural Networks** = Brain regions (structure/routing)
+- **LLMs** = Neurons (information processing units)
+- **Memory Palace NN** = Long-term spatial memory
+- **Corpus Colosseum** = Short-term working memory with multi-agent voting
+- **Frontal Lobe Model** = Executive function and meta-cognition
+
+## Key Architectural Principles
+
+### 1. Two-Tier Memory System
+**Short-Term: Corpus Colosseum**
+- Ephemeral workspace where multiple LLM-neurons process tasks in parallel
+- Uses lattice structure to find where outputs converge
+- Convergence algorithms (DBSCAN, consensus voting, attractor networks) identify winning interpretations
+- Resets frequently to stay focused on current task
+- Filters hallucinations through consensus
+
+**Long-Term: Memory Palace Chain**
+- Persistent spatial memory organized in sequential rooms (8x8x8 lattices each)
+- Sequential chaining preserves linear internal voice and narrative consciousness
+- Hash-based coordinate assignment within each room
+- New rooms created sequentially based on capacity, context shifts, or sleep cycles
+- Documented, contextualized storage (not just raw outputs)
+
+### 2. Memory Palace Chain Architecture
+
+**Main Chain (Linear/Conscious Thread)**
+- Room 1 → Room 2 → Room 3 → Room 4...
+- Real-time experience and decision-making
+- Forward-only during active processing
+- Represents the "awake" internal voice
+- Working memory = currently active room + last few rooms
+
+**Dream Branches (Exploratory)**
+- Spawn during sleep cycles from main chain rooms
+- Multiple parallel explorations with controlled hallucination
+- Random walks through memory space to find novel connections
+- Successful branches merge insights back to main chain
+- Failed branches pruned (retention policy TBD - start with aggressive pruning or soft decay)
+- Lightweight storage (pointers/differentials, not full palaces)
+
+**Learning Branches (Retrospective)**
+- Read backward through main chain to extract patterns
+- Create meta-memories and compressed summaries
+- Link non-adjacent rooms with shared structure
+- Generate "shortcuts" and indexed lemmas
+- Build causal models from historical decisions
+
+### 3. Information Flow
+
+```
+User Input/Task
+    ↓
+Specialized NN (preprocessing)
+    ↓
+JSON packets → Small quantized LLMs
+    ↓
+Corpus Colosseum (parallel processing)
+    ↓
+Convergence algorithm finds consensus
+    ↓
+Frontal Lobe Model (executive decision)
+    ↓
+Memory Palace (document outcome)
+    ↓
+Response/Action
+```
+
+### 4. Sleep Cycle Implementation
+- Triggered by time, memory pressure, or performance degradation
+- Restructures memory placement in Palace (not content, just organization)
+- Dream branches explore novel connections through hallucination
+- Learning branches consolidate patterns from recent experience
+- Annealing-style exploration: high randomness → focused refinement
+- Reward-weighted replay for successful outcomes
+- Memory compression: merge redundant/similar entries
+
+### 5. Technical Solutions
+
+**Latency Management**
+- Very small quantized models for LLM-neurons
+- Specialized NNs pre-process data into structured JSON
+- "Slow thinking that is smart is better than no thinking"
+
+**Credit Assignment**
+- Corpus Colosseum voting system (ensemble method)
+- State-space search framed like chess for clear win/loss conditions
+- Dynamic credit assignment based on outcomes
+
+**Parasympathetic vs Sympathetic Processing**
+- System 1 (fast/intuitive) vs System 2 (slow/deliberate)
+- Adaptive response based on urgency and complexity
+
+**Memory Transfer Criteria** (Colosseum → Palace)
+- Convergence strength (high consensus = important)
+- Repeated patterns across multiple resets
+- Success signals from outcomes
+- Explicit tagging by frontal lobe model
+
+## Current Status
+
+### Already Built (Memory Palace NN Repo)
+- 3D spatial knowledge graph (8x8x8 chess cube lattice)
+- DIM-Net for semantic-to-spatial encoding
+- Tier 1/Tier 2 hierarchical storage
+- PAO mnemonic generation with local LLMs (Ollama)
+- Training pipelines and data generators
+- API server and GUI
+- 512 spatial locations with geometric relationships
+
+### Still To Build
+
+**Priority 1: Core Integration**
+1. Corpus Colosseum module
+   - Multi-LLM parallel processing
+   - Convergence algorithm implementation
+   - Short-term lattice structure
+   - Reset mechanism
+
+2. Memory Palace Chain system
+   - Sequential room creation logic
+   - Hash-based coordinate assignment
+   - Inter-room linking/navigation
+   - Chain traversal for "internal voice"
+
+3. Frontal Lobe executive model
+   - Meta-reasoning about which modules to consult
+   - Goal-directed behavior
+   - Planning and sequencing
+
+**Priority 2: Sleep Cycle**
+1. Dream branch spawning
+   - Controlled hallucination algorithm
+   - Novel connection detection
+   - Branch merge/prune logic
+
+2. Learning branch implementation
+   - Backward chain traversal
+   - Pattern extraction
+   - Meta-memory creation
+
+3. Memory reorganization
+   - Usage-based spatial restructuring
+   - Consolidation and compression
+
+**Priority 3: Enhancement**
+1. Specialized NNs for different cognitive functions
+   - Visual processing
+   - Auditory processing
+   - Motor planning
+   - Emotional valence
+
+2. Inter-module communication protocols
+3. Self-modification and meta-learning capabilities
+
+## Experimental Approach
+
+### Metrics to Track
+- Convergence speed (Colosseum consensus time)
+- Convergence quality (task success rate)
+- Memory retrieval accuracy
+- Performance improvement over time
+- Coherence across decisions
+- Emergence of novel behaviors
+
+### Parameters to Test
+- Voting thresholds (majority vs supermajority)
+- Colosseum reset frequency
+- Palace promotion criteria
+- Room creation triggers
+- Dream branch retention policies
+- Learning consolidation intervals
+- Number of LLM-neurons per task
+
+### Design Decisions to Resolve Through Testing
+- Dream branch retention: immediate pruning vs soft decay vs archival
+- Room branching: strict linearity vs selective parallelism
+- Convergence algorithms: which performs best for different task types
+- Sleep cycle triggers: time-based vs memory-pressure vs performance
+- Hash strategy: content-based vs temporal vs hybrid
+
+## Research Questions
+
+### On Consciousness
+- Does modular architecture with memory consolidation exhibit emergent properties?
+- Is consciousness more about active processing or memory continuity?
+- Does the linear chain create phenomenological experience?
+- Can controlled hallucination lead to genuine insight?
+
+### On Architecture
+- How does spatial memory organization compare to vector embeddings?
+- What's the optimal balance between specialization and generalization?
+- Can the system learn its own optimal architecture?
+- How does multi-agent consensus compare to single-model reasoning?
+
+## Next Steps
+
+1. **Immediate**: Design Corpus Colosseum architecture
+   - Choose convergence algorithm
+   - Define LLM-neuron communication protocol
+   - Implement basic voting mechanism
+
+2. **Short-term**: Implement Memory Palace chaining
+   - Add sequential room creation to existing codebase
+   - Hash-based coordinate assignment
+   - Chain navigation methods
+
+3. **Medium-term**: Build sleep cycle
+   - Dream branch spawning
+   - Learning branch consolidation
+   - Memory reorganization algorithms
+
+4. **Long-term**: Full system integration
+   - Connect all modules
+   - Implement frontal lobe executive
+   - Comprehensive testing and iteration
+
+## Key Insights
+
+- **Empirical over theoretical**: Test different approaches and let data guide decisions
+- **Start simple**: Aggressive pruning, basic voting, then add complexity as needed
+- **Keep detailed logs**: Emergent behaviors appear unexpectedly
+- **Consciousness may be emergent**: Focus on capabilities, not forcing consciousness
+- **Memory is active, not static**: The Palace learns its own organization
+- **Sequential chain enables narrative**: Linear internal voice creates coherent identity
+
+## Philosophy
+
+This isn't just an AGI prototype - it's exploring fundamental questions about:
+- What constitutes thinking vs mere computation
+- Whether consciousness requires biology or just the right information architecture
+- How memory, processing, and identity interrelate
+- Whether synthetic consciousness is possible
+
+The goal is to build a system that doesn't just process information, but potentially experiences it.
