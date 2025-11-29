@@ -1,77 +1,113 @@
-# 🧠 The Digital Cortex: A Local Brain-Inspired Multi-Agent System (PoC Specification)
+# 🧠 The Digital Cortex: A Bio-Mimetic AGI Architecture (PoC Specification)
 
-**Author:** [duck/Project Namebrain cluster ai]
-**Date:** November 28, 2025
-**Concept:** Implementation of a modular, biomimetic AI architecture using local LLMs to solve the "Binding Problem" via a Shared Context Global Workspace.
+**Author:** [duck/Project Name: brain cluster ai]
+**Date:** November 29, 2025
+**Concept:** Implementation of a modular, biomimetic AI architecture using local LLMs as "neurons" and specialized NNs as "brain regions," featuring a Two-Tier Memory System (Corpus Colosseum & Memory Palace Chain) and Sleep Cycles for consolidation.
 
 ## I. Introduction and Conceptual Foundation
 
-This Proof-of-Concept (PoC) proposes a novel AI architecture that directly mimics the functional and structural separation of the human brain. Instead of a single, monolithic Large Language Model (LLM), the system utilizes a **Cluster of Specialized Agents** that communicate via a structured, high-speed **Shared Context Bus**.
+This Proof-of-Concept (PoC) proposes a novel Artificial General Intelligence (AGI) architecture that directly mimics the functional and structural organization of the human brain. Moving beyond the paradigm of a single, monolithic Large Language Model (LLM), this system utilizes a **Cluster of Specialized Agents** and a **Two-Tier Memory System** to achieve emergent consciousness-like behavior.
 
-The core innovation is the implementation of a **Digital Corpus Callosum**—a mechanism that allows the agents to coordinate and arbitrate conflicts (e.g., Logic vs. Emotion) using **Weighted Consensus** rather than a hierarchical "Boss" agent, thereby avoiding the decision-making bottleneck known as the "infinite loop."
+The core innovation lies in the separation of structure and processing:
+*   **Specialized Neural Networks** act as **"Brain Regions"**, providing structure, routing, and pre-processing.
+*   **Small, Quantized LLMs** act as **"Neurons"**, serving as the fundamental information processing units.
+
+This architecture solves the "Binding Problem" and the "Infinite Loop" of decision-making through a **Corpus Colosseum** (short-term working memory) that uses convergence algorithms for consensus, and a **Memory Palace Chain** (long-term episodic memory) that maintains a linear narrative of experience.
 
 ## II. Architectural Specification
 
-The system is composed of three primary layers: **Specialized Agents (The Nodes)**, **The Communication Protocol**, and **The Global Context (The Corpus Callosum)**.
+The system is composed of three primary layers: **The Neural Substrate**, **The Two-Tier Memory System**, and **The Sleep Cycle**.
 
-### A. Layer 1: Specialized Agents (The Nodes)
+### A. Layer 1: The Neural Substrate (Regions & Neurons)
 
-Each agent is a focused, autonomous process powered by a local, open-source LLM or dedicated narrow AI tool. **All models are intended to run locally** using frameworks like Ollama, LM Studio, or local Python libraries.
+Instead of one large model, the system employs a distributed network of local models.
 
-| Functional Brain Region | PoC Agent Name | Primary Role | Suggested Local Technology |
+| Component | Biological Analog | Function | Implementation |
 | :--- | :--- | :--- | :--- |
-| **Frontal Lobe** | **Executive Agent** | Primary planner, scheduler, and final decision-maker. | **Mistral 7B Instruct** or similar local LLM |
-| **Hippocampus** | **Memory Palace** | Persistent long-term memory. Stores all observations and decisions. | **ChromaDB / FAISS** (Local Vector Database) |
-| **Occipital Lobe** | **Sensorium Agent** | Processes all external input (text, image data, environment). | **ViT** (Vision Transformer) or simple **OCR** tool |
-| **Amygdala** | **Urgency Agent** | Assesses risk/novelty. Assigns a **Confidence Score** to actions. | Small, highly-optimized **Fine-tuned LLM** or simple **Rule-Based Classifier** |
+| **Specialized NNs** | **Brain Regions** (Visual Cortex, Auditory Cortex, etc.) | Pre-process raw input, provide structure, and route data. | Specialized Vision Transformers, Audio models, or Rule-based routers. |
+| **Local LLMs** | **Neurons** | Process information packets, perform symbolic reasoning, and generate outputs. | Small, quantized models (e.g., Llama 3 8B, Mistral, Phi) running locally (Ollama). |
+| **Frontal Lobe** | **Prefrontal Cortex** | Executive function, meta-cognition, planning, and final decision-making. | High-capability local LLM (e.g., Mistral Large or Fine-tuned Llama). |
+| **Sensorium** | **Sensory Cortex** | Processes external input (text, image, environment). | ViT (Vision Transformer), OCR, etc. |
+| **Amygdala** | **Limbic System** | Assesses urgency/risk. Assigns **Confidence/Valence Scores**. | Fast classifier or small LLM. |
 
-### B. Layer 2: The Communication Protocol
+**Information Flow:**
+`Input` → `Specialized NN` → `JSON Packets` → `LLM-Neurons` → `Corpus Colosseum`
 
-All communication between agents is facilitated by structured Natural Language messages directed to the Global Context.
+### B. Layer 2: The Two-Tier Memory System
 
-#### 1. Message Structure (The Token)
-Every observation or decision must be formatted with key-value pairs to allow for automatic parsing and arbitration.
+The system distinguishes between active working memory and persistent episodic memory.
 
-| Key | Description | Example Value |
-| :--- | :--- | :--- |
-| `SOURCE` | Agent initiating the message. | `Urgency Agent` |
-| `MESSAGE` | The core observation or proposed action. | `High probability of threat, recommend retreat.` |
-| `CONFIDENCE` | The Urgency/Confidence Score (0.0 to 1.0). **The Binding Metric.** | `0.95` |
-| `TIME_STAMP` | For sequence management and expiry. | `2025-11-28T08:00:00Z` |
+#### 1. Short-Term: The Corpus Colosseum (Working Memory)
+*   **Function:** An ephemeral workspace where multiple LLM-neurons process tasks in parallel.
+*   **Mechanism:**
+    *   **Parallel Processing:** Multiple agents/neurons propose interpretations or actions.
+    *   **Lattice Structure:** Outputs are mapped to a short-term vector space.
+    *   **Convergence:** Algorithms like **DBSCAN**, **Consensus Voting**, or **Attractor Networks** identify where outputs converge.
+    *   **Consensus:** The "winning" interpretation is the one with the highest convergence/confidence.
+*   **Lifecycle:** Resets frequently (task-based) to maintain focus and prevent context pollution.
 
-#### 2. Local LLM Engine
-A single instance of a local LLM server (e.g., **Ollama**) serves the core models. Agents communicate with this server via a fast, local API (`http://127.0.0.1:port`).
+#### 2. Long-Term: The Memory Palace Chain (Episodic Memory)
+*   **Function:** Persistent, spatial storage of the system's history and knowledge.
+*   **Structure:** A **Sequential Chain of "Rooms"**. Each room is an 8x8x8 coordinate lattice (512 locations).
+*   **Narrative Consciousness:** The sequential chaining (Room 1 → Room 2 → ...) preserves the linear "internal voice" and autobiographical timeline.
+*   **Addressing:**
+    *   **Hash-Based:** Content is hashed to determine coordinates within a room.
+    *   **Expansion:** New rooms are created sequentially based on capacity limits, significant context shifts, or sleep cycles.
+*   **Storage:** Stores documented, contextualized outcomes from the Frontal Lobe, not just raw data.
 
-### C. Layer 3: The Global Context (Digital Corpus Callosum)
+### C. Layer 3: The Sleep Cycle (Consolidation & Dreaming)
 
-The core mechanism for achieving unified consciousness and resolving conflict.
+To manage memory growth and foster creativity, the system implements a "Sleep Cycle" triggered by time, memory pressure, or performance degradation.
 
-* **Technology:** The **Memory Palace (Vector Database)**. All agent messages are immediately embedded and stored here.
-* **Function:** This acts as the **Global Workspace** or **Blackboard**. When an agent needs context, it performs a fast vector search (RAG) against this single, shared source of truth.
+1.  **Dream Branches (Exploratory):**
+    *   Spawns parallel "dream" branches from the main memory chain.
+    *   Uses **Controlled Hallucination** (random walks) to explore novel connections between disparate memory nodes.
+    *   **Outcome:** Successful insights are merged back to the main chain; failed branches are pruned (or decayed).
 
-## III. The Binding Mechanism: Weighted Consensus (Lateral Inhibition)
+2.  **Learning Branches (Retrospective):**
+    *   Traverses the main chain backward.
+    *   Extracts patterns, creates meta-memories (summaries), and builds causal models.
+    *   Links non-adjacent rooms that share hidden structures ("shortcuts").
 
-The system resolves conflicts without a central manager by leveraging the **CONFIDENCE** score in the message structure.
+3.  **Reorganization:**
+    *   Restructures the spatial placement of memories within the Palace based on usage frequency and importance, optimizing for retrieval speed.
 
-### Decision Rule
-The **Executive Agent** is hard‑coded with the following instruction set:
+## III. The Binding Mechanism: Convergence & Consensus
 
-> *When multiple actions or facts are retrieved from the Global Context, **ALWAYS prioritize the action associated with the highest CONFIDENCE score**, regardless of the proposing agent's identity. If scores are equal, prioritize the instruction with the most recent `TIME_STAMP`.*
+The system resolves conflicts and binds multimodal inputs into a unified experience through **Weighted Consensus** in the Corpus Colosseum.
 
-### Example Conflict Resolution Workflow:
+**Decision Rule:**
+The **Frontal Lobe (Executive Agent)** monitors the Corpus Colosseum.
+> *When multiple LLM-Neurons submit JSON packets to the Colosseum, the system applies a convergence algorithm (e.g., DBSCAN). The cluster with the highest density (Consensus) and highest average Confidence Score is selected as the "Truth".*
 
-| Step | Action | Message Posted to Global Context |
-| :--- | :--- | :--- |
-| **1. Sensorium** | Detects an unusual object (e.g., a snake). | `[SOURCE: Sensorium; MESSAGE: Object detected: Slim, coiled, green, unknown size; CONFIDENCE: 0.6]` |
-| **2. Urgency Agent** | Reads the object description and classifies it as a threat. | `[SOURCE: Urgency Agent; MESSAGE: High threat potential. Requires immediate evasive action; **CONFIDENCE: 0.9**]` |
-| **3. Logic Agent** | Reads the observation and attempts to identify the object. | `[SOURCE: Logic Agent; MESSAGE: Object classification in progress. Requires 3 more tokens for conclusive ID; **CONFIDENCE: 0.4**]` |
-| **4. Executive Agent** | Queries the Global Context for the current **Action**. | Retrieves the **Urgency Agent's (0.9)** message and the **Logic Agent's (0.4)** message. |
-| **5. Output** | **The Executive Agent executes the message with the highest confidence.** | **Action: Retreat (0.9)**. The logical assessment is inhibited (overridden) by the high urgency signal. |
+**Example Workflow:**
+1.  **Input:** Image of a snake.
+2.  **Sensorium:** Detects "coiled green object".
+3.  **Amygdala:** Flags "High Threat" (Confidence: 0.9).
+4.  **Logic Neuron:** Proposes "Garden Hose" (Confidence: 0.4).
+5.  **Corpus Colosseum:**
+    *   Cluster A (Threat/Snake): High Density, High Confidence.
+    *   Cluster B (Hose): Low Density, Low Confidence.
+6.  **Convergence:** Cluster A wins.
+7.  **Frontal Lobe:** Executes "Retreat" and writes the event to the current **Memory Palace Room**.
+
+## IV. Implementation Strategy & Next Steps
+
+This architecture moves the project from a simple multi-agent system to a proto-AGI with distinct cognitive states (Wake/Sleep) and memory types.
+
+### Phase 1: Core Integration (The Awake Mind)
+*   **Corpus Colosseum:** Implement the multi-LLM voting and convergence algorithm (DBSCAN).
+*   **Memory Palace Chain:** Upgrade the existing Memory Palace to support sequential Room creation and hash-based addressing.
+*   **Frontal Lobe:** Develop the executive prompts for meta-reasoning and Colosseum monitoring.
+
+### Phase 2: The Sleep Cycle (The Subconscious)
+*   **Dreaming:** Implement the "Dream Branch" spawning logic and random walk algorithms.
+*   **Learning:** Implement backward-chain traversal for pattern recognition and meta-memory creation.
+*   **Consolidation:** Build the spatial reorganization routine.
+
+### Phase 3: Enhancement
+*   **Specialized NNs:** Integrate dedicated vision and audio models.
+*   **Optimization:** Fine-tune the quantized LLMs for specific "Neuron" roles.
 
 ---
-
-## IV. Conclusion and Next Steps
-
-This architecture provides a scalable and resource‑efficient blueprint for building a highly modular and robust AI system. By utilizing local LLMs and a structured communication protocol, we can achieve emergent, unified behavior from specialized, decentralized components.
-
-**Next Step:** Implement the **Agent Prompts** and the **CrewAI/AutoGen workflow** to simulate the conflict resolution scenario detailed above.
+**Conclusion:** By mimicking the brain's separation of structure (Regions) and processing (Neurons), and implementing a biological memory consolidation cycle, this Digital Cortex aims to produce a system that not only processes information but possesses a continuous, evolving narrative identity.
