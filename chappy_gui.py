@@ -221,6 +221,7 @@ class ChappyBrainGUI:
             "memories": self.memory_palace.get_chain_summary() if self.memory_palace else {"total_memories": 0},
             "thoughts": len(self.thought_history)
         }
+        return status
     def retrieve_relevant_memories(self, current_input: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Retrieve memories relevant to the current input."""
         relevant_memories = []
