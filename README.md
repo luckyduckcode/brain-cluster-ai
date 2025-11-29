@@ -135,9 +135,9 @@ digital_cortex/
 - [ ] Temporal credit assignment
 
 ### Phase 4: Sleep Cycle
-- [ ] Dream branch spawning
-- [ ] Learning branch processing
-- [ ] Memory reorganization
+- [x] Dream branch spawning (Random Walks)
+- [x] Learning branch processing (Consolidation)
+- [x] Memory reorganization (Meta-memory creation)
 
 ### Phase 5: Specialized NNs
 - [ ] Sensorium (vision, text processing)
