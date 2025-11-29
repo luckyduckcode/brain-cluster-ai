@@ -182,7 +182,11 @@ class CorpusColosseum:
         if not cluster_info:
             # All noise points, select highest confidence message
             best_idx = np.argmax([msg.confidence for msg in self.messages])
-            return self.messages[best_idx], {"selection": "highest_confidence_fallback"}
+            best_message = self.messages[best_idx]
+            return best_message, {
+                "selection": "highest_confidence_fallback",
+                "contributing_neurons": [best_message.source]
+            }
         
         # Score each cluster
         cluster_scores = {}
@@ -202,6 +206,7 @@ class CorpusColosseum:
             "winning_cluster_size": winning_cluster["size"],
             "winning_cluster_avg_confidence": winning_cluster["avg_confidence"],
             "cluster_score": cluster_scores[winning_cluster_id],
+            "contributing_neurons": winning_cluster["sources"],
             "selection": "cluster_consensus"
         }
         

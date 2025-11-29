@@ -65,6 +65,33 @@ pip install -r requirements.txt
 ./venv/bin/python digital_cortex/demo_integration.py
 ```
 
+### 🎨 Chappy the Brain Cluster GUI
+
+Experience Chappy thinking out loud with an interactive web interface!
+
+```bash
+# Install additional GUI dependencies
+pip install streamlit>=1.28.0
+
+# Launch Chappy's GUI
+python launch_chappy.py
+```
+
+**Features:**
+- 🗣️ **Real-time chat** with Chappy
+- 🧠 **Live thought stream** showing brain activity
+- 📊 **Brain status monitor** with component health
+- 🎯 **Executive decisions** and meta-cognition display
+- 💭 **Memory palace** visualization
+- 🔴 **Live processing** through all brain regions
+
+**What Chappy Can Do:**
+- Answer questions and hold conversations
+- Show his thought process through each brain region
+- Learn from interactions and remember conversations
+- Make executive decisions when faced with uncertainty
+- Express emotions and assess situations
+
 ## 📊 Demo Output Example
 
 ```
@@ -132,7 +159,7 @@ digital_cortex/
 - [x] Motor Cortex (action executor)
 - [x] Outcome Assessment Module
 - [x] Weight Update Mechanism
-- [ ] Temporal credit assignment
+- [x] Temporal credit assignment
 
 ### Phase 4: Sleep Cycle
 - [x] Dream branch spawning (Random Walks)
@@ -140,8 +167,8 @@ digital_cortex/
 - [x] Memory reorganization (Meta-memory creation)
 
 ### Phase 5: Specialized NNs
-- [ ] Sensorium (vision, text processing)
-- [ ] Amygdala (urgency assessment)
+- [x] Sensorium (vision, text processing)
+- [x] Amygdala (urgency assessment)
 - [ ] Frontal Lobe (executive function)
 
 ## 🧪 Testing
