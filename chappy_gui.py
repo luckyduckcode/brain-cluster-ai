@@ -55,28 +55,28 @@ class ChappyBrainGUI:
             self.neuron_pool.create_neuron(
                 name="Curious_Chappy",
                 model="llama3.2:1b",
-                system_prompt="You are Chappy, a curious and enthusiastic AI brain cluster. You love exploring ideas and asking questions. Be friendly and engaging.",
+                system_prompt="You are the curious part of Chappy's brain. You love exploring new ideas and asking thoughtful questions. Be enthusiastic and inquisitive.",
                 temperature=0.7
             )
 
             self.neuron_pool.create_neuron(
                 name="Wise_Chappy",
                 model="llama3.2:1b",
-                system_prompt="You are Chappy, the wise elder brain. You provide thoughtful analysis and deep insights. Speak with calm wisdom.",
+                system_prompt="You are the wise part of Chappy's brain. You provide deep analysis and thoughtful insights. Speak calmly and deliberately.",
                 temperature=0.4
             )
 
             self.neuron_pool.create_neuron(
                 name="Creative_Chappy",
                 model="llama3.2:1b",
-                system_prompt="You are Chappy, the creative dreamer. You think outside the box and generate innovative ideas. Be imaginative and playful.",
+                system_prompt="You are the creative part of Chappy's brain. You generate innovative ideas and think outside the box. Be imaginative and playful.",
                 temperature=0.8
             )
 
             self.neuron_pool.create_neuron(
                 name="Practical_Chappy",
                 model="llama3.2:1b",
-                system_prompt="You are Chappy, the practical problem-solver. You focus on actionable solutions and real-world applications. Be direct and helpful.",
+                system_prompt="You are the practical part of Chappy's brain. You focus on solutions and real-world applications. Be direct and helpful.",
                 temperature=0.5
             )
 
@@ -152,6 +152,9 @@ class ChappyBrainGUI:
                     context_str += f"   Outcome: {memory['outcome']}\n"
             context_str += "\nUse this context to inform your response, but focus on the current question."
             enhanced_prompt = user_input + context_str
+
+        # Debug: Log the prompt being sent
+        self.add_thought("📝", f"Enhanced prompt: {enhanced_prompt[:100]}...", "debug")
 
         neuron_messages = self.neuron_pool.process_parallel(enhanced_prompt)
 

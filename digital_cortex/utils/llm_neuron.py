@@ -69,7 +69,7 @@ class LLMNeuron:
         
         # Add confidence extraction instruction if needed
         if extract_confidence:
-            full_prompt += "\n\nProvide your confidence level (0.0 to 1.0) at the end in format: [CONFIDENCE: X.XX]"
+            full_prompt += "\n\nIMPORTANT: At the very end of your response, on a new line, include exactly: [CONFIDENCE: X.XX] where X.XX is your confidence level from 0.0 to 1.0."
         
         # Call Ollama API
         try:
@@ -79,9 +79,12 @@ class LLMNeuron:
             # Extract confidence if present
             confidence = self._extract_confidence(content) if extract_confidence else 0.5
             
-            # Remove confidence tag from content
+            # Remove confidence tag from content (only if it's at the end)
             if "[CONFIDENCE:" in content:
-                content = content.split("[CONFIDENCE:")[0].strip()
+                # Only remove if it appears at the end of the response
+                confidence_pos = content.rfind("[CONFIDENCE:")
+                if confidence_pos > len(content) * 0.7:  # If it's in the last 30% of the content
+                    content = content[:confidence_pos].strip()
             
             # Create message
             message = Message.create(
