@@ -123,10 +123,10 @@ digital_cortex/
 ## 🎯 What's Next (Roadmap)
 
 ### Phase 2: Memory Palace Chain
-- [ ] Sequential room creation
-- [ ] Hash-based addressing
-- [ ] Chain traversal for "internal voice"
-- [ ] Integration with existing Memory Palace NN
+- [x] Sequential room creation
+- [x] Hash-based addressing
+- [x] Chain traversal for "internal voice"
+- [x] Integration with Corpus Colosseum outputs
 
 ### Phase 3: Feedback Cycle
 - [ ] Motor Cortex (action executor)
