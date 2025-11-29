@@ -322,6 +322,9 @@ def main():
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
+    if 'last_input_time' not in st.session_state:
+        st.session_state.last_input_time = datetime.now()
+
     chappy = st.session_state.chappy
 
     # Sidebar with brain status
@@ -334,6 +337,7 @@ def main():
                 if success:
                     st.success("Chappy is awake and ready to think!")
                     chappy.add_thought("🌅", "Good morning! Chappy's brain is now online.", "system")
+                    st.session_state.last_input_time = datetime.now()  # Reset timer on wake up
                 else:
                     st.error("Failed to wake Chappy. Check Ollama connection.")
 
@@ -418,6 +422,9 @@ def main():
         if chappy.current_state == "sleeping":
             st.error("Chappy is sleeping! Click 'Wake Up Chappy' first.")
         else:
+            # Update last input time
+            st.session_state.last_input_time = datetime.now()
+            
             # Add user message
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
@@ -442,6 +449,34 @@ def main():
         thoughts_container = st.empty()
 
         while True:
+            # Check for auto-prompt every 2 seconds
+            if 'last_input_time' in st.session_state:
+                time_since_last_input = (datetime.now() - st.session_state.last_input_time).total_seconds()
+                if time_since_last_input > 60:  # 1 minute
+                    auto_prompts = [
+                        "What should I think about next?",
+                        "I'm feeling curious about something new. What comes to mind?",
+                        "Time to explore a new idea. What's interesting right now?",
+                        "My brain is active. What topic should I dive into?",
+                        "I wonder what thoughts are brewing in my neurons..."
+                    ]
+                    import random
+                    auto_prompt = random.choice(auto_prompts)
+                    
+                    # Add auto-prompt as user message
+                    st.session_state.messages.append({"role": "user", "content": f"🤖 *Auto-prompt:* {auto_prompt}"})
+                    
+                    # Process with Chappy's brain
+                    try:
+                        response = chappy.process_input(auto_prompt)
+                        st.session_state.messages.append({"role": "assistant", "content": response})
+                        st.session_state.last_input_time = datetime.now()  # Reset timer after auto-processing
+                        st.rerun()  # Force UI update
+                    except Exception as e:
+                        error_msg = f"Oops! Chappy had a brain freeze during auto-thought: {e}"
+                        chappy.add_thought("❌", f"Auto-prompt error: {e}", "error")
+                        st.session_state.messages.append({"role": "assistant", "content": error_msg})
+
             thoughts = chappy.get_recent_thoughts(20)
             thought_display = ""
             for thought in thoughts:
