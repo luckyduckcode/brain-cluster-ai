@@ -72,7 +72,80 @@ To manage memory growth and foster creativity, the system implements a "Sleep Cy
 3.  **Reorganization:**
     *   Restructures the spatial placement of memories within the Palace based on usage frequency and importance, optimizing for retrieval speed.
 
-## III. The Binding Mechanism: Convergence & Consensus
+## III. The Feedback Cycle: Learning from Experience
+
+The Digital Cortex implements a **closed-loop feedback system** that enables continuous learning and improvement. This cycle transforms the system from a reactive processor into an adaptive agent that learns from outcomes.
+
+### The 10-Step Feedback Loop
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    FEEDBACK CYCLE                        │
+└─────────────────────────────────────────────────────────┘
+
+1. SENSORIUM captures computer state (t=0)
+2. AMYGDALA tags urgency/valence
+3. LLM-NEURONS propose actions
+4. CORPUS COLOSSEUM converges on decision
+5. FRONTAL LOBE executes action
+   │
+   ├─→ 6. MOTOR CORTEX performs action on computer
+   │
+   └─→ 7. SENSORIUM captures NEW state (t=1)
+        │
+        ├─→ 8. OUTCOME ASSESSMENT: Compare t=0 vs t=1
+        │
+        └─→ 9. MEMORY PALACE writes:
+             - Action taken
+             - Predicted outcome
+             - Actual outcome
+             - Success/failure signal
+             │
+             └─→ 10. WEIGHT UPDATE: Adjust neuron confidence
+                  │
+                  └─→ Back to step 1 (with updated model)
+```
+
+### Key Components
+
+**Motor Cortex (Action Executor)**
+*   Translates decisions into concrete actions on the computer system
+*   Executes commands, clicks, file operations, API calls, etc.
+*   Records action metadata for outcome assessment
+
+**Outcome Assessment Module**
+*   Compares predicted vs. actual outcomes
+*   Generates success/failure signals based on:
+    *   Goal achievement (did the action accomplish the intended result?)
+    *   State delta (how did the environment change?)
+    *   Error signals (did the action cause errors or unexpected behavior?)
+*   Assigns reward/penalty values for reinforcement
+
+**Weight Update Mechanism**
+*   Adjusts confidence scores for LLM-Neurons based on outcome
+*   Successful predictions → increased confidence weight
+*   Failed predictions → decreased confidence weight
+*   Implements temporal credit assignment (which neuron was responsible?)
+*   Updates stored in Memory Palace for long-term learning
+
+### Learning Dynamics
+
+**Short-Term Adaptation (Corpus Colosseum)**
+*   Immediate weight adjustments within current session
+*   Neurons that consistently produce successful outcomes gain voting power
+*   Failed neurons are temporarily down-weighted
+
+**Long-Term Consolidation (Memory Palace)**
+*   Sleep cycles analyze historical success/failure patterns
+*   Meta-learning: "Which types of neurons succeed in which contexts?"
+*   Persistent weight updates stored as part of system configuration
+
+**Meta-Cognition (Frontal Lobe)**
+*   Monitors overall system performance
+*   Identifies when to explore (try new approaches) vs. exploit (use proven strategies)
+*   Can request additional neurons or specialized modules when performance degrades
+
+## IV. The Binding Mechanism: Convergence & Consensus
 
 The system resolves conflicts and binds multimodal inputs into a unified experience through **Weighted Consensus** in the Corpus Colosseum.
 
@@ -91,7 +164,7 @@ The **Frontal Lobe (Executive Agent)** monitors the Corpus Colosseum.
 6.  **Convergence:** Cluster A wins.
 7.  **Frontal Lobe:** Executes "Retreat" and writes the event to the current **Memory Palace Room**.
 
-## IV. Implementation Strategy & Next Steps
+## V. Implementation Strategy & Next Steps
 
 This architecture moves the project from a simple multi-agent system to a proto-AGI with distinct cognitive states (Wake/Sleep) and memory types.
 
