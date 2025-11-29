@@ -235,9 +235,10 @@ class FrontalLobe:
             context["sensory"] = sensory
 
         if memory:
-            # Summarize recent relevant memories
+            # Include full memory details for comprehensive context
             context["memory"] = {
                 "count": len(memory),
+                "memories": memory,  # Include full memory list
                 "recent_decisions": [m.get("content", "") for m in memory[:3]],
                 "patterns": self._extract_memory_patterns(memory)
             }
@@ -395,11 +396,25 @@ class FrontalLobe:
         if not memory:
             return "- No memory context available"
 
-        return f"""
+        formatted = f"""
         - Memories available: {memory.get('count', 0)}
         - Recent decisions: {len(memory.get('recent_decisions', []))}
         - Patterns: {memory.get('patterns', 'None identified')}
         """
+
+        # Include actual memory content for better context
+        memories = memory.get('memories', [])
+        if memories:
+            formatted += "\n        RECENT MEMORY CONTENT:"
+            for i, mem in enumerate(memories[:3]):  # Show top 3 memories
+                content = mem.get('content', '')[:200]  # Truncate long content
+                relevance = mem.get('relevance_score', 0)
+                outcome = mem.get('outcome', {})
+                formatted += f"\n        {i+1}. [{relevance:.2f}] {content}..."
+                if outcome:
+                    formatted += f"\n           Outcome: {outcome}"
+
+        return formatted
 
     def _format_actions(self, actions: Optional[List]) -> str:
         """Format available actions for prompt."""

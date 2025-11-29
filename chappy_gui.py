@@ -10,6 +10,7 @@ import sys
 import time
 from datetime import datetime
 import json
+from typing import List, Dict, Any
 
 # Add the project path
 sys.path.insert(0, '/home/duck/Documents/brain cluster ai')
@@ -90,30 +91,72 @@ class ChappyBrainGUI:
         """Process user input through Chappy's brain."""
         self.add_thought("🗣️", f"User said: '{user_input}'", "input")
 
+        # Step 0: Memory Retrieval - Get relevant context from Memory Palace
+        self.current_state = "retrieving_memories"
+        relevant_memories = self.retrieve_relevant_memories(user_input, limit=5)
+
+        if relevant_memories:
+            self.add_thought("🧠", f"Retrieved {len(relevant_memories)} relevant memories for context", "memory")
+            for i, memory in enumerate(relevant_memories[:3]):  # Show top 3
+                self.add_thought("💭", f"Memory {i+1}: {memory['content'][:80]}... (rel: {memory['relevance_score']:.2f})", "memory")
+        else:
+            self.add_thought("🧠", "No relevant memories found - starting fresh", "memory")
+
+        # Create memory context for brain regions
+        memory_context = {
+            "count": len(relevant_memories),
+            "recent_memories": relevant_memories,
+            "last_interaction": relevant_memories[0] if relevant_memories else None,
+            "context_available": len(relevant_memories) > 0
+        }
+
         # Step 1: Sensorium processing
         self.current_state = "processing_sensory"
         sensory_msg = self.sensorium.process_text(
             user_input,
             source="user_input",
-            metadata={"input_type": "conversation", "timestamp": datetime.now().isoformat()}
+            metadata={
+                "input_type": "conversation",
+                "timestamp": datetime.now().isoformat(),
+                "memory_context": memory_context
+            }
         )
-        self.add_thought("👁️", f"Sensorium analyzed: {sensory_msg.content[:100]}...", "sensorium")
+        self.add_thought("👁️", f"Sensorium analyzed: {sensory_msg.content[:100]}... (with {memory_context['count']} memories)", "sensorium")
 
         # Step 2: Amygdala assessment
         self.current_state = "assessing_emotion"
-        amygdala_msg = self.amygdala.process_message(sensory_msg)
+        # Enhance amygdala message with memory context
+        enhanced_sensory = Message.create(
+            sensory_msg.source,
+            sensory_msg.content,
+            sensory_msg.confidence,
+            {**sensory_msg.metadata, "memory_context": memory_context}
+        )
+        amygdala_msg = self.amygdala.process_message(enhanced_sensory)
         assessment = amygdala_msg.metadata.get("amygdala_assessment", {})
-        self.add_thought("💭", f"Amygdala feels: threat={assessment.get('threat_level', 0):.2f}, urgency={assessment.get('urgency', 0):.2f}", "amygdala")
+        self.add_thought("💭", f"Amygdala feels: threat={assessment.get('threat_level', 0):.2f}, urgency={assessment.get('urgency', 0):.2f} (context aware)", "amygdala")
 
         # Step 3: Add to Colosseum
         self.colosseum.add_message(amygdala_msg)
 
-        # Step 4: Neuron processing
+        # Step 4: Neuron processing with memory context
         self.current_state = "thinking"
-        neuron_messages = self.neuron_pool.process_parallel(user_input)
+
+        # Enhance the user input with memory context for neurons
+        enhanced_prompt = user_input
+        if memory_context["context_available"]:
+            context_str = "\n\nCONTEXT FROM MEMORY PALACE:\n"
+            for i, memory in enumerate(relevant_memories[:3]):  # Top 3 memories
+                context_str += f"{i+1}. Previous: {memory['content'][:200]}...\n"
+                if memory.get("outcome"):
+                    context_str += f"   Outcome: {memory['outcome']}\n"
+            context_str += "\nUse this context to inform your response, but focus on the current question."
+            enhanced_prompt = user_input + context_str
+
+        neuron_messages = self.neuron_pool.process_parallel(enhanced_prompt)
 
         for msg in neuron_messages:
-            self.add_thought("🧠", f"{msg.source}: {msg.content[:150]}...", "neuron")
+            self.add_thought("🧠", f"{msg.source}: {msg.content[:150]}... (memory-enhanced)", "neuron")
             self.colosseum.add_message(msg)
 
         # Step 5: Find consensus
@@ -137,14 +180,14 @@ class ChappyBrainGUI:
             memory_address = self.memory_palace.store_memory(winner, outcome_data)
             self.add_thought("🧠", f"Stored memory at: {memory_address}", "memory")
 
-            # Step 8: Executive decision (if needed)
+            # Step 8: Executive decision (if needed) with memory context
             if assessment.get('threat_level', 0) > 0.3 or assessment.get('urgency', 0) > 0.3:
                 self.current_state = "making_decision"
                 actions = ["respond_normally", "ask_for_clarification", "seek_help", "end_conversation"]
                 decision = self.frontal_lobe.make_executive_decision(
-                    winner, assessment, sensory_msg.metadata, [], actions
+                    winner, assessment, sensory_msg.metadata, relevant_memories, actions
                 )
-                self.add_thought("🎯", f"Executive decision: {decision.decision}", "executive")
+                self.add_thought("🎯", f"Executive decision: {decision.decision} (memory-informed)", "executive")
 
             self.current_state = "ready"
             return winner.content
@@ -178,9 +221,61 @@ class ChappyBrainGUI:
             "memories": self.memory_palace.get_chain_summary() if self.memory_palace else {"total_memories": 0},
             "thoughts": len(self.thought_history)
         }
-        return status
+    def retrieve_relevant_memories(self, current_input: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """Retrieve memories relevant to the current input."""
+        relevant_memories = []
 
-    def shutdown_brain(self):
+        if not self.memory_palace:
+            return relevant_memories
+
+        try:
+            # Get recent memories from the current room
+            summary = self.memory_palace.get_chain_summary()
+            if summary['total_memories'] == 0:
+                return relevant_memories
+
+            # For now, get the most recent memories
+            # TODO: Implement semantic similarity search
+            recent_memories = []
+            current_room = self.memory_palace.current_room
+
+            # Get memories from current room (simplified approach)
+            if hasattr(current_room, 'memories'):
+                for coord, memory_data in list(current_room.memories.items())[-limit:]:
+                    memory_info = {
+                        "address": f"room_{current_room.room_id}_{coord}",
+                        "content": memory_data.get("content", ""),
+                        "outcome": memory_data.get("outcome_data", {}),
+                        "timestamp": memory_data.get("timestamp", ""),
+                        "relevance_score": 0.5  # Placeholder for future semantic matching
+                    }
+                    recent_memories.append(memory_info)
+
+            # Simple keyword matching for relevance
+            input_words = set(current_input.lower().split())
+            for memory in recent_memories:
+                memory_content = memory["content"].lower()
+                memory_words = set(memory_content.split())
+
+                # Calculate simple overlap score
+                overlap = len(input_words.intersection(memory_words))
+                total_words = len(input_words.union(memory_words))
+
+                if total_words > 0:
+                    relevance = overlap / total_words
+                    memory["relevance_score"] = relevance
+
+                    # Include memories with some relevance
+                    if relevance > 0.1 or len(relevant_memories) < 3:  # Always include at least 3 recent memories
+                        relevant_memories.append(memory)
+
+            # Sort by relevance and return top memories
+            relevant_memories.sort(key=lambda x: x["relevance_score"], reverse=True)
+            return relevant_memories[:limit]
+
+        except Exception as e:
+            self.add_thought("⚠️", f"Memory retrieval error: {e}", "system")
+            return relevant_memories
         """Gracefully shut down Chappy's brain components."""
         self.add_thought("😴", "Initiating shutdown sequence...", "system")
 
