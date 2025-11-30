@@ -17,6 +17,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/venv/bin/activate"
 
 # Run the desktop app
-python3 "$SCRIPT_DIR/chappy_desktop.py"
+python3 "$SCRIPT_DIR/chappy_standalone_simple.py"
 
 echo "👋 Chappy desktop app closed."

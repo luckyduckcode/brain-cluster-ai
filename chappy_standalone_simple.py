@@ -17,7 +17,6 @@ from datetime import datetime
 # Add project path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from chappy_gui import ChappyBrainGUI
 from digital_cortex.corpus_colosseum import CorpusColosseum
 from digital_cortex.utils.llm_neuron import NeuronPool
 from digital_cortex.memory_palace import MemoryManager, MemorySystem
@@ -26,6 +25,51 @@ from digital_cortex.amygdala import Amygdala
 from digital_cortex.frontal_lobe import FrontalLobe
 from digital_cortex.feedback.learner import WeightLearner
 from digital_cortex.learning_center import VideoLearningContainer
+
+class ChappyBrain:
+    """Minimal brain class for standalone desktop app."""
+
+    def __init__(self):
+        """Initialize Chappy's brain components."""
+        self.colosseum = None
+        self.neuron_pool = None
+        self.memory_palace = None
+        self.sensorium = None
+        self.amygdala = None
+        self.frontal_lobe = None
+        self.learner = None
+        self.video_learning = None
+        self.thought_history = []
+        self.current_state = "sleeping"
+        self.reasoning_paths = []
+        self.decision_history = []
+
+    async def process_input_async(self, user_input):
+        """Process user input asynchronously."""
+        try:
+            # Simple processing - just use the neuron pool for now
+            if self.neuron_pool and len(self.neuron_pool.neurons) > 0:
+                # Get response from first available neuron
+                neuron = list(self.neuron_pool.neurons.values())[0]
+                response = await neuron.process_async(user_input)
+                return response.content if hasattr(response, 'content') else str(response)
+            else:
+                return "Hello! I'm Chappy, but my brain isn't fully initialized yet. Please wait a moment for me to wake up!"
+        except Exception as e:
+            return f"Sorry, I encountered an error: {str(e)}"
+
+    def process_input(self, user_input):
+        """Process user input through Chappy's brain (synchronous wrapper)."""
+        try:
+            # Run async processing in new event loop
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(self.process_input_async(user_input))
+            loop.close()
+            return result
+        except Exception as e:
+            return f"Sorry, I encountered an error processing your message: {str(e)}"
 
 # Set appearance
 ctk.set_appearance_mode("system")
@@ -37,7 +81,7 @@ class ChappyDesktopApp:
     def __init__(self):
         self.root = ctk.CTk()
         self.root.title("🧠 Chappy AI")
-        self.root.geometry("900x700")
+        self.root.geometry("900x750")  # Increased height for additional input area
         self.root.minsize(700, 500)
 
         # Initialize brain
@@ -69,11 +113,15 @@ class ChappyDesktopApp:
         # Input area at bottom
         self.setup_input_area()
 
+        # Data input area (second text box)
+        self.setup_data_input_area()
+
         # Status at very bottom
         self.setup_status_area()
 
-        # Bind Enter key to send
-        self.root.bind('<Return>', lambda e: self.send_message())
+        # Bind Enter key to send (Ctrl+Enter for multi-line)
+        self.root.bind('<Control-Return>', lambda e: self.send_message())
+        self.message_entry.bind('<Control-Return>', lambda e: self.send_message())
 
     def setup_welcome_header(self):
         """Setup a friendly welcome header."""
@@ -110,7 +158,7 @@ class ChappyDesktopApp:
         )
         chat_title.pack(pady=(10, 5))
 
-        # Chat display
+        # Chat display - read-only
         self.chat_display = scrolledtext.ScrolledText(
             chat_container,
             wrap=tk.WORD,
@@ -119,7 +167,8 @@ class ChappyDesktopApp:
             fg="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000",
             insertbackground="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000",
             padx=10,
-            pady=10
+            pady=10,
+            state="disabled"  # Make it read-only
         )
         self.chat_display.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
@@ -133,25 +182,35 @@ class ChappyDesktopApp:
 
     def setup_input_area(self):
         """Setup the message input area."""
-        input_frame = ctk.CTkFrame(self.main_frame, height=80)
+        input_frame = ctk.CTkFrame(self.main_frame, height=120)  # Increased height for multi-line input
         input_frame.pack(fill="x")
         input_frame.pack_propagate(False)
 
-        # Input field
-        self.message_entry = ctk.CTkEntry(
+        # Input field - now multi-line
+        self.message_entry = scrolledtext.ScrolledText(
             input_frame,
-            placeholder_text="Type your message to Chappy...",
-            font=ctk.CTkFont(size=12),
-            height=40
+            wrap=tk.WORD,
+            font=("Segoe UI", 12),
+            bg="#2b2b2b" if ctk.get_appearance_mode() == "Dark" else "#ffffff",
+            fg="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000",
+            insertbackground="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000",
+            padx=10,
+            pady=10,
+            height=3  # 3 lines visible
         )
         self.message_entry.pack(side="left", fill="x", expand=True, padx=(10, 5), pady=10)
+
+        # Placeholder text for multi-line input
+        self.message_entry.insert("1.0", "Type your message to Chappy...")
+        self.message_entry.bind("<FocusIn>", self._clear_placeholder)
+        self.message_entry.bind("<FocusOut>", self._restore_placeholder)
 
         # Send button
         self.send_button = ctk.CTkButton(
             input_frame,
             text="📤 Send",
             width=80,
-            height=40,
+            height=60,  # Taller button to match input height
             command=self.send_message
         )
         self.send_button.pack(side="right", padx=(0, 10), pady=10)
@@ -159,6 +218,101 @@ class ChappyDesktopApp:
         # Initially disable input until brain is ready
         self.message_entry.configure(state="disabled")
         self.send_button.configure(state="disabled")
+
+        # Set initial placeholder color
+        self.message_entry.configure(fg="#888888")
+
+    def setup_data_input_area(self):
+        """Setup a second input area for data/commands."""
+        data_frame = ctk.CTkFrame(self.main_frame, height=100)
+        data_frame.pack(fill="x", pady=(5, 10))
+        data_frame.pack_propagate(False)
+
+        # Data input label
+        data_label = ctk.CTkLabel(
+            data_frame,
+            text="📊 Data/Command Input",
+            font=ctk.CTkFont(size=12, weight="bold")
+        )
+        data_label.pack(pady=(5, 2))
+
+        # Data input field
+        self.data_entry = scrolledtext.ScrolledText(
+            data_frame,
+            wrap=tk.WORD,
+            font=("Segoe UI", 11),
+            bg="#2b2b2b" if ctk.get_appearance_mode() == "Dark" else "#ffffff",
+            fg="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000",
+            insertbackground="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000",
+            padx=8,
+            pady=8,
+            height=2  # 2 lines visible
+        )
+        self.data_entry.pack(fill="x", padx=10, pady=(0, 5))
+
+        # Placeholder for data input
+        self.data_entry.insert("1.0", "Enter URLs, commands, or data here...")
+        self.data_entry.bind("<FocusIn>", self._clear_data_placeholder)
+        self.data_entry.bind("<FocusOut>", self._restore_data_placeholder)
+        self.data_entry.configure(fg="#888888")
+
+        # Process data button
+        self.process_data_button = ctk.CTkButton(
+            data_frame,
+            text="⚡ Process",
+            width=80,
+            height=30,
+            command=self.process_data_input
+        )
+        self.process_data_button.pack(pady=(0, 5))
+
+        # Initially disable data input until brain is ready
+        self.data_entry.configure(state="disabled")
+        self.process_data_button.configure(state="disabled")
+
+    def _clear_data_placeholder(self, event):
+        """Clear placeholder text when user focuses on data input."""
+        if self.data_entry.get("1.0", "end-1c") == "Enter URLs, commands, or data here...":
+            self.data_entry.delete("1.0", tk.END)
+            self.data_entry.configure(fg="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000")
+
+    def _restore_data_placeholder(self, event):
+        """Restore placeholder text if data input is empty."""
+        if not self.data_entry.get("1.0", "end-1c").strip():
+            self.data_entry.insert("1.0", "Enter URLs, commands, or data here...")
+            self.data_entry.configure(fg="#888888")
+
+    def process_data_input(self):
+        """Process data/command input."""
+        if not self.is_brain_active:
+            self.add_message("system", "Chappy's brain is still waking up. Please wait a moment...")
+            return
+
+        data = self.data_entry.get("1.0", "end-1c").strip()
+        if not data or data == "Enter URLs, commands, or data here...":
+            return
+
+        # Add to chat as a special data message
+        self.add_message("system", f"📊 Processing data: {data}")
+        self.data_entry.delete("1.0", tk.END)
+
+        # Show processing indicator
+        self.status_label.configure(text="⚡ Processing data...")
+        self.process_data_button.configure(state="disabled")
+
+        # Process data in background
+        def process_data():
+            try:
+                # For now, just echo back - can be extended for specific data processing
+                response = f"I received your data/command: '{data}'. I'm processing it now..."
+                self.add_message("chappy", response)
+            except Exception as e:
+                self.add_message("system", f"Oops! Error processing data: {str(e)}")
+            finally:
+                self.status_label.configure(text="✅ Ready!")
+                self.process_data_button.configure(state="normal")
+
+        threading.Thread(target=process_data, daemon=True).start()
 
     def setup_status_area(self):
         """Setup a simple status area."""
@@ -179,8 +333,11 @@ class ChappyDesktopApp:
         else:  # system
             formatted = f"💭 {content}\n\n"
 
+        # Temporarily enable to insert text
+        self.chat_display.configure(state="normal")
         self.chat_display.insert(tk.END, formatted, msg_type)
         self.chat_display.see(tk.END)
+        self.chat_display.configure(state="disabled")
 
         # Store in history
         self.message_history.append({
@@ -189,19 +346,31 @@ class ChappyDesktopApp:
             "timestamp": timestamp
         })
 
+    def _clear_placeholder(self, event):
+        """Clear placeholder text when user focuses on input."""
+        if self.message_entry.get("1.0", "end-1c") == "Type your message to Chappy...":
+            self.message_entry.delete("1.0", tk.END)
+            self.message_entry.configure(fg="#ffffff" if ctk.get_appearance_mode() == "Dark" else "#000000")
+
+    def _restore_placeholder(self, event):
+        """Restore placeholder text if input is empty."""
+        if not self.message_entry.get("1.0", "end-1c").strip():
+            self.message_entry.insert("1.0", "Type your message to Chappy...")
+            self.message_entry.configure(fg="#888888")
+
     def send_message(self):
         """Send a message to Chappy."""
         if not self.is_brain_active:
             self.add_message("system", "Chappy's brain is still waking up. Please wait a moment...")
             return
 
-        message = self.message_entry.get().strip()
-        if not message:
+        message = self.message_entry.get("1.0", "end-1c").strip()
+        if not message or message == "Type your message to Chappy...":
             return
 
         # Add user message
         self.add_message("user", message)
-        self.message_entry.delete(0, tk.END)
+        self.message_entry.delete("1.0", tk.END)  # Clear the input
 
         # Show typing indicator
         self.status_label.configure(text="💭 Chappy is thinking...")
@@ -227,7 +396,7 @@ class ChappyDesktopApp:
                 self.status_label.configure(text="🧠 Initializing Chappy's brain...")
 
                 # Create brain instance
-                self.brain = ChappyBrainGUI()
+                self.brain = ChappyBrain()
 
                 # Initialize components asynchronously
                 asyncio.run(self._async_init_brain())
@@ -238,6 +407,8 @@ class ChappyDesktopApp:
                 # Enable input
                 self.message_entry.configure(state="normal")
                 self.send_button.configure(state="normal")
+                self.data_entry.configure(state="normal")
+                self.process_data_button.configure(state="normal")
 
                 # Add ready message
                 self.add_message("system", "Hi! I'm ready to chat. What would you like to talk about?")
@@ -246,58 +417,58 @@ class ChappyDesktopApp:
                 self.status_label.configure(text="❌ Brain initialization failed")
                 self.add_message("system", f"Sorry, I had trouble waking up my brain: {str(e)}")
 
-        async def _async_init_brain(self):
-            """Async brain initialization."""
-            try:
-                # Initialize components
-                self.brain.colosseum = CorpusColosseum(embedding_dim=128, dbscan_eps=0.4)
-                self.brain.neuron_pool = NeuronPool()
-                self.brain.memory_palace = MemoryManager(system=MemorySystem.GRAPH, max_nodes=5000)
-                self.brain.sensorium = Sensorium()
-                self.brain.amygdala = Amygdala()
-                self.brain.frontal_lobe = FrontalLobe()
-                self.brain.learner = WeightLearner(storage_path="chappy_weights.json")
-
-                # Initialize video learning container
-                self.brain.video_learning = VideoLearningContainer(
-                    corpus_colosseum=self.brain.colosseum,
-                    memory_palace=self.brain.memory_palace
-                )
-                # Initialize video learning if possible
-                try:
-                    video_init_success = await self.brain.video_learning.initialize()
-                    if not video_init_success:
-                        print("Video learning initialization failed, but continuing...")
-                except Exception as e:
-                    print(f"Video learning init error: {e}")
-
-                # Create personality neurons
-                personalities = [
-                    ("Curious_Chappy", "You are Curious Chappy, very enthusiastic and loves asking questions. Start with 'Hey there!'"),
-                    ("Wise_Chappy", "You are Wise Chappy, thoughtful and deliberate. Start with 'My friend,'"),
-                    ("Creative_Chappy", "You are Creative Chappy, imaginative and playful. Start with 'What if'"),
-                    ("Practical_Chappy", "You are Practical Chappy, direct and helpful. Start with 'Let's get practical'")
-                ]
-
-                for name, prompt in personalities:
-                    self.brain.neuron_pool.create_neuron(
-                        name=name,
-                        model="llama3.2:1b",
-                        system_prompt=prompt,
-                        temperature=0.7
-                    )
-
-                self.brain.current_state = "awake"
-                self.brain.thought_history = []
-                self.brain.reasoning_paths = []
-                self.brain.decision_history = []
-
-            except Exception as e:
-                print(f"Failed to initialize Chappy's brain: {e}")
-                raise
-
         self.brain_thread = threading.Thread(target=init_brain, daemon=True)
         self.brain_thread.start()
+
+    async def _async_init_brain(self):
+        """Async brain initialization."""
+        try:
+            # Initialize components
+            self.brain.colosseum = CorpusColosseum(embedding_dim=128, dbscan_eps=0.4)
+            self.brain.neuron_pool = NeuronPool()
+            self.brain.memory_palace = MemoryManager(system=MemorySystem.GRAPH, max_nodes=5000)
+            self.brain.sensorium = Sensorium()
+            self.brain.amygdala = Amygdala()
+            self.brain.frontal_lobe = FrontalLobe()
+            self.brain.learner = WeightLearner(storage_path="chappy_weights.json")
+
+            # Initialize video learning container
+            self.brain.video_learning = VideoLearningContainer(
+                corpus_colosseum=self.brain.colosseum,
+                memory_palace=self.brain.memory_palace
+            )
+            # Initialize video learning if possible
+            try:
+                video_init_success = await self.brain.video_learning.initialize()
+                if not video_init_success:
+                    print("Video learning initialization failed, but continuing...")
+            except Exception as e:
+                print(f"Video learning init error: {e}")
+
+            # Create personality neurons
+            personalities = [
+                ("Curious_Chappy", "You are Curious Chappy, very enthusiastic and loves asking questions. Start with 'Hey there!'"),
+                ("Wise_Chappy", "You are Wise Chappy, thoughtful and deliberate. Start with 'My friend,'"),
+                ("Creative_Chappy", "You are Creative Chappy, imaginative and playful. Start with 'What if'"),
+                ("Practical_Chappy", "You are Practical Chappy, direct and helpful. Start with 'Let's get practical'")
+            ]
+
+            for name, prompt in personalities:
+                self.brain.neuron_pool.create_neuron(
+                    name=name,
+                    model="llama3.2:1b",
+                    system_prompt=prompt,
+                    temperature=0.7
+                )
+
+            self.brain.current_state = "awake"
+            self.brain.thought_history = []
+            self.brain.reasoning_paths = []
+            self.brain.decision_history = []
+
+        except Exception as e:
+            print(f"Failed to initialize Chappy's brain: {e}")
+            raise
 
     def run(self):
         """Run the application."""

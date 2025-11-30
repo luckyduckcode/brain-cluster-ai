@@ -13,7 +13,7 @@ REM Activate virtual environment
 call "%SCRIPT_DIR%venv\Scripts\activate.bat"
 
 REM Run the desktop app
-python "%SCRIPT_DIR%chappy_desktop.py"
+python "%SCRIPT_DIR%chappy_standalone_simple.py"
 
 echo 👋 Chappy desktop app closed.
 pause

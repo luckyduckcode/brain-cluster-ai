@@ -250,7 +250,7 @@ Run Chappy as a standalone desktop application with his own native window!
 launch_chappy_desktop.bat
 
 # Or directly
-python3 chappy_desktop.py
+python3 chappy_standalone_simple.py
 ```
 
 **System Requirements:**
