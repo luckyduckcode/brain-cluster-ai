@@ -1,0 +1,24 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting customtkinter
+  Downloading customtkinter-5.2.2-py3-none-any.whl.metadata (677 bytes)
+Collecting darkdetect
+  Downloading darkdetect-0.8.0-py3-none-any.whl.metadata (3.6 kB)
+Requirement already satisfied: yt-dlp in /usr/lib/python3/dist-packages (2024.4.9)
+Requirement already satisfied: opencv-python in /home/duck/.local/lib/python3.12/site-packages (4.12.0.88)
+Requirement already satisfied: packaging in /usr/lib/python3/dist-packages (from customtkinter) (24.0)
+Requirement already satisfied: brotli in /usr/lib/python3/dist-packages (from yt-dlp) (1.1.0)
+Requirement already satisfied: certifi in /usr/lib/python3/dist-packages (from yt-dlp) (2023.11.17)
+Requirement already satisfied: mutagen in /usr/lib/python3/dist-packages (from yt-dlp) (1.46.0)
+Requirement already satisfied: pycryptodomex in /usr/lib/python3/dist-packages (from yt-dlp) (3.20.0)
+Requirement already satisfied: requests<3,>=2.31.0 in /usr/lib/python3/dist-packages (from yt-dlp) (2.31.0)
+Requirement already satisfied: urllib3<3,>=1.26.17 in /usr/lib/python3/dist-packages (from yt-dlp) (2.0.7)
+Collecting websockets>=12.0 (from yt-dlp)
+  Downloading websockets-15.0.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+Requirement already satisfied: numpy<2.3.0,>=2 in /home/duck/.local/lib/python3.12/site-packages (from opencv-python) (2.2.6)
+Downloading customtkinter-5.2.2-py3-none-any.whl (296 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 296.1/296.1 kB 2.1 MB/s eta 0:00:00
+Downloading darkdetect-0.8.0-py3-none-any.whl (9.0 kB)
+Downloading websockets-15.0.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (182 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 182.5/182.5 kB 2.9 MB/s eta 0:00:00
+Installing collected packages: websockets, darkdetect, customtkinter
+Successfully installed customtkinter-5.2.2 darkdetect-0.8.0 websockets-15.0.1

@@ -28,6 +28,7 @@ from digital_cortex.memory_palace import MemoryManager, MemorySystem
 from digital_cortex.sensorium import Sensorium
 from digital_cortex.amygdala import Amygdala
 from digital_cortex.frontal_lobe import FrontalLobe
+from digital_cortex.learning_center import VideoLearningContainer
 
 
 class ChappyBrainGUI:
@@ -42,6 +43,7 @@ class ChappyBrainGUI:
         self.amygdala = None
         self.frontal_lobe = None
         self.learner = None
+        self.video_learning = None
         self.thought_history = []
         self.current_state = "sleeping"
 
@@ -62,6 +64,13 @@ class ChappyBrainGUI:
             self.amygdala = Amygdala()
             self.frontal_lobe = FrontalLobe()
             self.learner = WeightLearner(storage_path="chappy_weights.json")
+
+            # Initialize video learning container
+            self.video_learning = VideoLearningContainer(
+                corpus_colosseum=self.colosseum,
+                memory_palace=self.memory_palace
+            )
+            # Note: Video learning will be initialized asynchronously when needed
 
             # Create diverse personality neurons for Chappy
             self.neuron_pool.create_neuron(
@@ -102,6 +111,27 @@ class ChappyBrainGUI:
     def process_input(self, user_input):
         """Process user input through Chappy's brain."""
         self.add_thought("🗣️", f"User said: '{user_input}'", "input")
+
+        # Check if this is a video learning request first
+        if self.video_learning:
+            try:
+                # Initialize video learning if not already done
+                if not hasattr(self.video_learning, '_initialized'):
+                    import asyncio
+                    asyncio.run(self.video_learning.initialize())
+                    self.video_learning._initialized = True
+
+                video_message = Message(
+                    source="user_input",
+                    content=user_input.lower(),
+                    confidence=1.0
+                )
+                video_response = asyncio.run(self.video_learning.process_message(video_message))
+                if video_response:
+                    self.add_thought("🎥", f"Video learning handled: {video_response.content[:100]}...", "video_learning")
+                    return video_response.content
+            except Exception as e:
+                self.add_thought("❌", f"Video learning error: {e}", "error")
 
         # Step 0: Memory Retrieval - Get relevant context from Memory Palace
         self.current_state = "retrieving_memories"
@@ -299,7 +329,8 @@ class ChappyBrainGUI:
             "state": self.current_state,
             "neurons": len(self.neuron_pool.neurons) if self.neuron_pool else 0,
             "memories": self.memory_palace.get_chain_summary() if self.memory_palace else {"total_memories": 0},
-            "thoughts": len(self.thought_history)
+            "thoughts": len(self.thought_history),
+            "video_learning": self.video_learning.get_container_info() if self.video_learning else {"status": "not_initialized"}
         }
         return status
     def retrieve_relevant_memories(self, current_input: str, limit: int = 5) -> List[Dict[str, Any]]:
@@ -330,6 +361,15 @@ class ChappyBrainGUI:
         self.amygdala = None
         self.frontal_lobe = None
         self.learner = None
+
+        # Shutdown video learning container
+        if self.video_learning:
+            try:
+                import asyncio
+                asyncio.run(self.video_learning.shutdown())
+            except Exception as e:
+                print(f"Error shutting down video learning: {e}")
+        self.video_learning = None
 
         self.current_state = "sleeping"
         self.add_thought("🌙", "Chappy's brain has been shut down. Sweet dreams!", "system")
