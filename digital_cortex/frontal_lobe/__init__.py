@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from ..utils.message import Message
 from ..utils.llm_neuron import LLMNeuron
+from ..cortex_regions.meta_cognition import MetaCognitionLayer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -57,6 +58,8 @@ class FrontalLobe:
             model=model,
             temperature=temperature
         )
+        
+        self.meta_layer = MetaCognitionLayer()
 
         # System prompt for executive function
         self.system_prompt = """
@@ -106,11 +109,17 @@ class FrontalLobe:
         Returns:
             ExecutiveDecision with comprehensive analysis and plan
         """
+        # Monitor consensus state
+        cognitive_state = self.meta_layer.monitor_consensus(consensus_message.metadata)
+        
         # Build comprehensive context
         context = self._build_decision_context(
             consensus_message, amygdala_assessment, sensory_context,
             memory_context, available_actions
         )
+        
+        # Add cognitive state to context
+        context["cognitive_state"] = cognitive_state
 
         # Create executive reasoning prompt
         prompt = self._create_executive_prompt(context)
@@ -144,10 +153,16 @@ class FrontalLobe:
 
         # Assess system performance
         performance_analysis = self._assess_system_performance(system_performance)
+        
+        # Get real-time meta-cognitive status
+        meta_status = self.meta_layer.get_status()
 
         # Generate meta-cognitive insights
         prompt = f"""
         Perform meta-cognition on the following system analysis:
+
+        REAL-TIME COGNITIVE STATE:
+        {meta_status}
 
         DECISION PATTERNS:
         {decision_patterns}

@@ -11,6 +11,9 @@ import json
 import logging
 from typing import Dict, Any, Optional, List
 from ..utils.message import Message
+from ..utils.confidence_scorer import ConfidenceScorer
+from ..utils.async_utils import async_wrap
+from ..utils.cache import SemanticCache
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,7 +35,8 @@ class LLMNeuron:
                  model: str = "llama3.2:1b",
                  ollama_url: str = "http://localhost:11434",
                  system_prompt: Optional[str] = None,
-                 temperature: float = 0.7):
+                 temperature: float = 0.7,
+                 cache: Optional[SemanticCache] = None):
         """
         Initialize an LLM-Neuron.
         
@@ -42,14 +46,17 @@ class LLMNeuron:
             ollama_url: URL of Ollama API
             system_prompt: Optional system prompt to define neuron's role
             temperature: Sampling temperature (0.0 = deterministic, 1.0 = creative)
+            cache: Optional SemanticCache instance for response caching
         """
         self.name = name
         self.model = model
         self.ollama_url = ollama_url
         self.system_prompt = system_prompt
         self.temperature = temperature
+        self.scorer = ConfidenceScorer()
+        self.cache = cache
         
-        logger.info(f"LLM-Neuron '{name}' initialized (model={model})")
+        logger.info(f"LLM-Neuron '{name}' initialized (model={model}, cache={'enabled' if cache else 'disabled'})")
     
     def process(self, prompt: str, extract_confidence: bool = True) -> Message:
         """
@@ -71,20 +78,24 @@ class LLMNeuron:
         if extract_confidence:
             full_prompt += "\n\nIMPORTANT: At the very end of your response, on a new line, include exactly: [CONFIDENCE: X.XX] where X.XX is your confidence level from 0.0 to 1.0."
         
+        # Check cache first
+        if self.cache:
+            cached_response = self.cache.get(full_prompt, self.model, self.temperature)
+            if cached_response:
+                logger.debug(f"{self.name} using cached response")
+                return cached_response
+        
         # Call Ollama API
         try:
             response = self._call_ollama(full_prompt)
             content = response.strip()
             
-            # Extract confidence if present
-            confidence = self._extract_confidence(content) if extract_confidence else 0.5
+            # Extract confidence using advanced scorer
+            confidence = self.scorer.score(content) if extract_confidence else 0.5
             
-            # Remove confidence tag from content (only if it's at the end)
-            if "[CONFIDENCE:" in content:
-                # Only remove if it appears at the end of the response
-                confidence_pos = content.rfind("[CONFIDENCE:")
-                if confidence_pos > len(content) * 0.7:  # If it's in the last 30% of the content
-                    content = content[:confidence_pos].strip()
+            # Remove confidence tag from content
+            if extract_confidence:
+                content = self.scorer.remove_confidence_tags(content)
             
             # Create message
             message = Message.create(
@@ -98,6 +109,11 @@ class LLMNeuron:
             )
             
             logger.debug(f"{self.name} generated response (confidence={confidence:.2f})")
+            
+            # Store in cache
+            if self.cache:
+                self.cache.put(full_prompt, self.model, self.temperature, message)
+            
             return message
             
         except Exception as e:
@@ -109,6 +125,22 @@ class LLMNeuron:
                 confidence=0.0,
                 metadata={"error": True}
             )
+
+    async def process_async(self, prompt: str, extract_confidence: bool = True) -> Message:
+        """
+        Process a prompt asynchronously.
+        
+        Args:
+            prompt: The input prompt/task
+            extract_confidence: Whether to extract confidence from response
+            
+        Returns:
+            Message object with response and confidence score
+        """
+        # Wrap the synchronous process method
+        # In a real implementation, we would use aiohttp for true async I/O
+        # but running requests in an executor is a good first step
+        return await async_wrap(self.process)(prompt, extract_confidence)
     
     def _call_ollama(self, prompt: str) -> str:
         """Call Ollama API to generate response."""
@@ -129,25 +161,7 @@ class LLMNeuron:
         result = response.json()
         return result.get("response", "")
     
-    def _extract_confidence(self, text: str) -> float:
-        """Extract confidence score from response text."""
-        import re
-        
-        patterns = [
-            r'\[CONFIDENCE:\s*([0-9.]+)\]',
-            r'[Cc]onfidence:\s*([0-9.]+)',
-        ]
-        
-        for pattern in patterns:
-            match = re.search(pattern, text)
-            if match:
-                try:
-                    confidence = float(match.group(1))
-                    return max(0.0, min(1.0, confidence))
-                except ValueError:
-                    continue
-        
-        return 0.5
+
     
     def __repr__(self) -> str:
         return f"LLMNeuron(name={self.name}, model={self.model})"
@@ -172,7 +186,7 @@ class NeuronPool:
         return neuron
     
     def process_parallel(self, prompt: str, neuron_names: Optional[List[str]] = None) -> List[Message]:
-        """Process a prompt with multiple neurons."""
+        """Process a prompt with multiple neurons (synchronous/sequential)."""
         if neuron_names:
             neurons = [self.neurons[name] for name in neuron_names if name in self.neurons]
         else:
@@ -182,7 +196,7 @@ class NeuronPool:
             logger.warning("No neurons available")
             return []
         
-        logger.info(f"Processing with {len(neurons)} neurons")
+        logger.info(f"Processing with {len(neurons)} neurons (sequential)")
         
         messages = []
         for neuron in neurons:
@@ -190,6 +204,38 @@ class NeuronPool:
             messages.append(message)
         
         return messages
+
+    async def process_parallel_async(self, prompt: str, neuron_names: Optional[List[str]] = None) -> List[Message]:
+        """
+        Process a prompt with multiple neurons in parallel (asynchronous).
+        
+        Args:
+            prompt: Input prompt
+            neuron_names: Optional list of specific neurons to use
+            
+        Returns:
+            List of Message objects
+        """
+        import asyncio
+        
+        if neuron_names:
+            neurons = [self.neurons[name] for name in neuron_names if name in self.neurons]
+        else:
+            neurons = list(self.neurons.values())
+        
+        if not neurons:
+            logger.warning("No neurons available")
+            return []
+        
+        logger.info(f"Processing with {len(neurons)} neurons (parallel async)")
+        
+        # Create tasks for all neurons
+        tasks = [neuron.process_async(prompt) for neuron in neurons]
+        
+        # Wait for all tasks to complete
+        messages = await asyncio.gather(*tasks)
+        
+        return list(messages)
     
     def list_neurons(self) -> List[str]:
         """List all neuron names."""
