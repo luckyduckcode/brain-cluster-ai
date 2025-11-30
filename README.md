@@ -2,7 +2,38 @@
 
 A brain-inspired multi-agent AI architecture using local LLMs as "neurons" and specialized neural networks as "brain regions."
 
-## 🎯 What We've Built (Phase 1 Complete!)
+## 🎯 What We've Built (Major Milestones Complete!)
+
+### ✅ **Digital Body Architecture - COMPLETE**
+**Status:** 100% Complete
+
+**What was built:**
+- **Container Architecture**: Multi-container pod with sensory/motor/brain/autonomic containers
+- **Message Bus**: Inter-container communication for sensory-motor-brain feedback loops
+- **Health Monitoring**: Resource usage, component status, auto-regulation
+- **Digital Body Integration**: Complete embodied AI system with all brain regions
+
+### ✅ **YouTube Learning System - COMPLETE**
+**Status:** 100% Complete
+
+**What was built:**
+- **Video Acquisition**: YouTube download, frame extraction, audio processing
+- **Multimodal Sensorium**: Vision (LLaVA), Audio (Whisper STT), Text (captions/OCR)
+- **Learning Orchestration**: Parallel processing, consensus synthesis, knowledge extraction
+- **Memory Integration**: Store concepts, facts, procedures in Memory Palace
+- **Knowledge Retrieval**: Query and apply learned video knowledge
+- **Container Integration**: Video processing container with GPU acceleration
+
+**Usage:**
+```bash
+# Learn from a YouTube video
+"learn from video: https://youtube.com/watch?v=VIDEO_ID"
+
+# Query learned knowledge
+"what do you know about machine learning?"
+"find videos about neural networks"
+"learning stats"
+```
 
 ### ✅ Core Components Implemented
 
@@ -36,25 +67,85 @@ A brain-inspired multi-agent AI architecture using local LLMs as "neurons" and s
 # Install Ollama
 curl https://ollama.ai/install.sh | sh
 
-# Pull a model
-ollama pull llama3.2:1b
+# Pull required models
+ollama pull llama3.2:1b          # Main reasoning model
+ollama pull llava:7b             # Vision processing (for video learning)
 
-# Start Ollama server
-ollama serve
+# Install system dependencies (Ubuntu/Debian)
+sudo apt-get update
+sudo apt-get install ffmpeg       # For video processing
+
+# Install Python dependencies
+pip install -r requirements.txt
 ```
 
-### Desktop App (Recommended)
+**Additional Models for Full Functionality:**
+- `llava:7b` - Vision-language model for video frame analysis
+- `whisper` - Audio transcription (handled by yt-dlp integration)
+
+### 🖥️ **Standalone Desktop App - NEW!**
+**Status:** Complete - Modern Native Application
+
+**What was built:**
+- **CustomTkinter Interface**: Beautiful, modern desktop app with dark/light themes
+- **Tabbed Interface**: Chat, Learning, Memory, and System monitoring tabs
+- **Real-time Chat**: Direct integration with Chappy's brain without web browser
+- **Video Learning**: Integrated YouTube learning with progress tracking
+- **Memory Visualization**: View and manage Chappy's learned knowledge
+- **System Monitoring**: Real-time brain status and performance metrics
+- **Native Performance**: No browser overhead, direct Python execution
+
+**Features:**
+- 💬 Real-time chat with Chappy's multimodal brain
+- 🎥 One-click YouTube video learning
+- 🧠 Memory palace visualization
+- 📊 Live system monitoring
+- 🎨 Modern UI with automatic dark/light theme detection
+- ⌨️ Keyboard shortcuts (Ctrl+N for new chat, Ctrl+Q to quit)
+- 💾 Conversation saving and export
+
+**Usage:**
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
-# Launch Chappy Desktop App
-./launch_chappy_desktop.sh  # Linux/Mac
-# or
-launch_chappy_desktop.bat   # Windows
+# Launch Standalone Desktop App
+python3 launch_chappy_standalone.py
+
+# Or run directly
+python3 chappy_standalone.py
+
+# Test the installation
+python3 test_standalone.py
 ```
 
-### Web Interface
+**Features:**
+- 💬 Real-time chat with Chappy's multimodal brain
+- 🎥 One-click YouTube video learning with progress tracking
+- 🧠 Memory palace visualization and management
+- 📊 Live system monitoring and brain status
+- 🎨 Modern UI with automatic dark/light theme detection
+- ⌨️ Keyboard shortcuts (Ctrl+N for new chat, Ctrl+Q to quit)
+- 💾 Conversation saving and export capabilities
+- 🔄 Brain restart and settings management
+
+**System Requirements:**
+- Python 3.12+
+- 4GB RAM minimum, 8GB recommended
+- Ollama with llama3.2:1b model
+- For video learning: ffmpeg, yt-dlp, OpenCV
+
+**Desktop Integration (Linux):**
+```bash
+# Copy desktop entry to applications
+cp chappy.desktop ~/.local/share/applications/
+
+# Create icon (256x256 PNG recommended)
+# Save as: chappy_icon.png in project root
+# Then search for "Chappy AI" in your app launcher
+```
+
+### 🌐 Web Interface (Legacy)
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -96,8 +187,14 @@ python3 launch_dashboard.py
 python3 -m venv venv
 source venv/bin/activate  # or: ./venv/bin/activate
 
-# Install dependencies
+# Install dependencies (includes video processing libraries)
 pip install -r requirements.txt
+
+# Install additional video processing dependencies
+pip install yt-dlp opencv-python
+
+# For GPU acceleration (optional)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
 ### Run Tests
@@ -167,6 +264,9 @@ python3 chappy_desktop.py
 - Learn from interactions and remember conversations
 - Make executive decisions when faced with uncertainty
 - Express emotions and assess situations
+- **🎥 Watch and learn from YouTube videos** through multimodal processing
+- **📚 Recall and apply knowledge** learned from educational videos
+- **🧠 Build knowledge base** from video content with structured extraction
 
 ## 🌐 REST API
 
@@ -296,6 +396,36 @@ curl -X POST http://localhost:8000/api/v1/tools/execute \
 - Timeout protection
 - Restricted system access
 
+## 🎥 YouTube Learning System
+
+Chappy can now watch and learn from educational YouTube videos!
+
+**Features:**
+- **🎬 Video Acquisition**: Downloads YouTube videos and extracts frames
+- **🧠 Multimodal Processing**: Parallel vision (LLaVA), audio (Whisper), and text analysis
+- **📚 Knowledge Extraction**: Uses LLM to synthesize structured knowledge from videos
+- **🧠 Memory Integration**: Stores learned concepts in the Memory Palace
+- **🔍 Knowledge Retrieval**: Query and recall learned video content
+- **📊 Learning Statistics**: Track videos processed and knowledge extracted
+
+**Usage Examples:**
+```bash
+# Teach Chappy about machine learning
+"learn from video: https://youtube.com/watch?v=VIDEO_ID"
+
+# Ask about learned topics
+"what do you know about neural networks?"
+"find videos about artificial intelligence"
+"learning stats"
+```
+
+**Technical Details:**
+- Processes videos at 1 FPS for temporal analysis
+- Uses Ollama LLaVA for vision understanding
+- Whisper for speech-to-text transcription
+- LLM synthesis for structured knowledge extraction
+- Full integration with existing brain consensus mechanisms
+
 ## 📊 Demo Output Example
 
 ```
@@ -311,25 +441,84 @@ curl -X POST http://localhost:8000/api/v1/tools/execute \
    Decision: Taking caution and prioritizing safety
 ```
 
+## 🎥 YouTube Learning Demo
+
+```bash
+# Run the video learning demo
+python3 demo_video_learning.py
+
+# Example output:
+🎥 Chappy's YouTube Learning System Demo
+==================================================
+🧠 Initializing brain components...
+🎬 Initializing video learning container...
+✅ Video learning system ready!
+
+💬 User: learning stats
+🎯 Chappy: 📊 Video Learning Statistics:
+• Videos Processed: 0
+• Total Learning Time: 0.0 seconds
+• Average Confidence: 0.00
+• Knowledge Items Extracted: 0
+
+💬 User: what do you know about machine learning?
+🎯 Chappy: 📚 Based on my video learning:
+[Chappy synthesizes knowledge from learned videos...]
+
+🎬 To learn from a YouTube video, use:
+💬 'learn from video: https://youtube.com/watch?v=VIDEO_ID'
+```
+
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────┐
 │           DIGITAL CORTEX SYSTEM                  │
 ├─────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────┐    │
+│  │         DIGITAL BODY CONTAINERS         │    │
+│  ├─────────────────────────────────────────┤    │
+│  │  ┌─────────────┐ ┌─────────────┐        │    │
+│  │  │  SENSORY    │ │   MOTOR     │        │    │
+│  │  │  CONTAINER  │ │  CONTAINER  │        │    │
+│  │  │             │ │             │        │    │
+│  │  │ 🎥 Video    │ │ 💪 Actions  │        │    │
+│  │  │ 🖼️ Vision   │ │ 🗣️ Speech   │        │    │
+│  │  │ 🔊 Audio    │ │ ✋ Motor    │        │    │
+│  │  └─────────────┘ └─────────────┘        │    │
+│  └─────────────────────────────────────────┘    │
+│         │              │                        │
+│         ▼              ▼                        │
+│  ┌─────────────────────────────────────────┐    │
+│  │           BRAIN CONTAINER               │    │
+│  ├─────────────────────────────────────────┤    │
+│  │  ┌──────────────┐      ┌──────────────┐ │    │
+│  │  │ LLM-Neurons  │─────▶│   Corpus     │ │    │
+│  │  │  (Parallel)  │      │  Colosseum   │ │    │
+│  │  └──────────────┘      │  (Consensus) │ │    │
+│  │         │              └──────┬───────┘ │    │
+│  │         │                     │          │    │
+│  │         ▼                     ▼          │    │
+│  │  ┌──────────────┐      ┌──────────────┐ │    │
+│  │  │   Message    │      │   Decision   │ │    │
+│  │  │   Protocol   │      │    Output    │ │    │
+│  │  └──────────────┘      └──────────────┘ │    │
+│  │                                           │    │
+│  │  ┌──────────────┐      ┌──────────────┐ │    │
+│  │  │  Memory      │      │   Frontal    │ │    │
+│  │  │   Palace     │◄────►│    Lobe      │ │    │
+│  │  │  (Long-term) │      │ (Executive)  │ │    │
+│  │  └──────────────┘      └──────────────┘ │    │
+│  └─────────────────────────────────────────┘    │
 │                                                  │
-│  ┌──────────────┐      ┌──────────────┐        │
-│  │ LLM-Neurons  │─────▶│   Corpus     │        │
-│  │  (Parallel)  │      │  Colosseum   │        │
-│  └──────────────┘      │  (Consensus) │        │
-│         │              └──────┬───────┘        │
-│         │                     │                 │
-│         ▼                     ▼                 │
-│  ┌──────────────┐      ┌──────────────┐        │
-│  │   Message    │      │   Decision   │        │
-│  │   Protocol   │      │    Output    │        │
-│  └──────────────┘      └──────────────┘        │
-│                                                  │
+│  ┌─────────────────────────────────────────┐    │
+│  │        AUTONOMIC CONTAINER              │    │
+│  ├─────────────────────────────────────────┤    │
+│  │  ┌──────────────┐      ┌──────────────┐ │    │
+│  │  │   Amygdala   │      │    Sleep     │ │    │
+│  │  │  (Emotion)   │      │   Cycle      │ │    │
+│  │  └──────────────┘      └──────────────┘ │    │
+│  └─────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -340,40 +529,110 @@ digital_cortex/
 ├── __init__.py
 ├── corpus_colosseum/
 │   ├── __init__.py
-│   └── colosseum.py          # Consensus mechanism
+│   ├── attention_consensus.py    # Advanced consensus mechanisms
+│   └── colosseum.py              # Consensus mechanism
+├── cortex_regions/
+│   ├── __init__.py
+│   ├── meta_cognition.py         # Self-monitoring system
+│   └── frontal_lobe.py           # Executive decision making
+├── learning_center/
+│   ├── __init__.py
+│   ├── video_acquisition.py      # YouTube video downloading
+│   ├── multimodal_sensorium.py   # Vision/audio/text processing
+│   ├── video_learning_orchestrator.py  # Learning coordination
+│   ├── knowledge_retrieval.py    # Knowledge querying
+│   └── video_learning_container.py     # Container integration
+├── memory_palace/
+│   ├── __init__.py
+│   ├── knowledge_graph.py        # Graph-based memory
+│   ├── memory_manager.py         # Memory management
+│   └── palace_chain.py           # Chain-based memory
+├── sensorium/
+│   ├── __init__.py
+│   └── sensorium.py              # Text processing
+├── amygdala/
+│   ├── __init__.py
+│   └── amygdala.py               # Emotion processing
+├── motor_cortex/
+│   ├── __init__.py
+│   └── executor.py               # Action execution
+├── feedback/
+│   ├── __init__.py
+│   ├── assessor.py               # Outcome assessment
+│   └── learner.py                # Weight learning
+├── sleep/
+│   ├── __init__.py
+│   ├── consolidator.py           # Memory consolidation
+│   └── dreamer.py                # Dream generation
 ├── utils/
 │   ├── __init__.py
-│   ├── message.py             # Message protocol
-│   └── llm_neuron.py          # LLM interface
+│   ├── message.py                # Message protocol
+│   ├── llm_neuron.py             # LLM interface
+│   ├── confidence_scorer.py      # Advanced confidence scoring
+│   ├── async_utils.py            # Async utilities
+│   ├── cache.py                  # Caching system
+│   ├── config.py                 # Configuration management
+│   └── model_manager.py          # Model management
 ├── tests/
-│   └── test_colosseum.py      # Unit tests
-├── demo_integration.py        # Full system demo
-└── test_neuron_quick.py       # Quick connectivity test
+│   ├── __init__.py
+│   ├── test_*.py                 # Comprehensive test suite
+│   └── __pycache__/
+├── demo_integration.py           # Full system demo
+├── test_neuron_quick.py          # Quick connectivity test
+└── __pycache__/
 ```
 
 ## 🎯 What's Next (Roadmap)
 
-### Phase 2: Memory Palace Chain
-- [x] Sequential room creation
-- [x] Hash-based addressing
-- [x] Chain traversal for "internal voice"
+### ✅ **Phase 1: Core Architecture - COMPLETE**
+- [x] Message Protocol with validation and factory methods
+- [x] Corpus Colosseum consensus mechanism with DBSCAN clustering
+- [x] LLM-Neuron interface with confidence extraction
+- [x] End-to-end integration demo
+
+### ✅ **Phase 2: Memory Palace Chain - COMPLETE**
+- [x] Sequential room creation with hash-based addressing
+- [x] Chain traversal for "internal voice" simulation
+- [x] Graph-based memory system for richer associations
 - [x] Integration with Corpus Colosseum outputs
 
-### Phase 3: Feedback Cycle
-- [x] Motor Cortex (action executor)
-- [x] Outcome Assessment Module
-- [x] Weight Update Mechanism
-- [x] Temporal credit assignment
+### ✅ **Phase 3: Feedback Cycle - COMPLETE**
+- [x] Motor Cortex (action executor) for task execution
+- [x] Outcome Assessment Module for performance evaluation
+- [x] Weight Update Mechanism with temporal credit assignment
+- [x] Learning integration across all brain regions
 
-### Phase 4: Sleep Cycle
-- [x] Dream branch spawning (Random Walks)
-- [x] Learning branch processing (Consolidation)
-- [x] Memory reorganization (Meta-memory creation)
+### ✅ **Phase 4: Sleep Cycle - COMPLETE**
+- [x] Dream branch spawning with random walks
+- [x] Learning branch processing and consolidation
+- [x] Memory reorganization with meta-memory creation
+- [x] Offline learning and memory optimization
 
-### Phase 5: Specialized NNs
-- [x] Sensorium (vision, text processing)
-- [x] Amygdala (urgency assessment)
-- [ ] Frontal Lobe (executive function)
+### ✅ **Phase 5: Specialized Neural Networks - COMPLETE**
+- [x] Sensorium (vision, text processing, multimodal input)
+- [x] Amygdala (urgency assessment and emotional processing)
+- [x] Frontal Lobe (executive function and decision making)
+- [x] Meta-cognition layer for self-monitoring
+
+### ✅ **Phase 6: Digital Body Architecture - COMPLETE**
+- [x] Container Architecture with multi-container pod design
+- [x] Message Bus for inter-container communication
+- [x] Health Monitoring and auto-regulation systems
+- [x] Complete embodied AI system integration
+
+### ✅ **Phase 7: YouTube Learning System - COMPLETE**
+- [x] Video Acquisition with YouTube downloading and frame extraction
+- [x] Multimodal Sensorium (Vision/Audio/Text parallel processing)
+- [x] Learning Orchestration with consensus synthesis
+- [x] Knowledge Extraction and structured learning
+- [x] Memory Integration with existing brain architecture
+- [x] Knowledge Retrieval and querying system
+
+### 🔄 **Phase 8: Multi-Agent Collaboration (In Progress)**
+- [ ] Agent communication protocols
+- [ ] Task decomposition and distribution
+- [ ] Collaborative problem-solving
+- [ ] Agent specialization and role assignment
 
 ## 🧪 Testing
 
@@ -383,6 +642,12 @@ The system has been validated with:
 - ✅ LLM-Neuron connectivity to Ollama
 - ✅ End-to-end integration with real LLMs
 - ✅ Snake vs Garden Hose scenario (white paper example)
+- ✅ Memory Palace chain operations
+- ✅ Feedback cycle weight updates
+- ✅ Sleep cycle memory consolidation
+- ✅ Digital Body container architecture
+- ✅ YouTube Learning System multimodal processing
+- ✅ Video knowledge extraction and retrieval
 
 ## 📝 Key Features
 
@@ -391,6 +656,10 @@ The system has been validated with:
 - **Extensible**: Easy to add new neuron types or consensus algorithms
 - **Bio-Inspired**: Architecture mirrors actual brain function
 - **Transparent**: Full visibility into decision-making process
+- **🎥 Video Learning**: Can watch and learn from YouTube videos
+- **🧠 Multimodal**: Processes vision, audio, and text simultaneously
+- **📚 Knowledge Base**: Builds structured knowledge from video content
+- **🏗️ Embodied AI**: Complete digital body with sensory-motor integration
 
 ## 🔬 Technical Details
 
@@ -427,4 +696,6 @@ See project repository for license information.
 
 ---
 
-**Status**: Phase 1 Complete ✅ | Next: Memory Palace Chain Integration
+**Status**: Digital Body Architecture ✅ | YouTube Learning System ✅ | Multi-Agent Collaboration 🔄
+
+**Latest Achievement**: Chappy can now watch educational YouTube videos and learn from them through sophisticated multimodal processing! 🎥🧠
