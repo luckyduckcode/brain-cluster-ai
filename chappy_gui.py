@@ -1,8 +1,8 @@
 """
-Chappy the Brain Cluster - Interactive AGI GUI
+Chappy the Brain Cluster - Enhanced Interactive AGI GUI
 
-A Streamlit-based interface for the Digital Cortex AGI system,
-allowing Chappy to communicate his thoughts and decisions.
+An advanced Streamlit-based interface for the Digital Cortex AGI system,
+featuring thought visualization, confidence indicators, and interactive reasoning exploration.
 """
 
 import streamlit as st
@@ -10,7 +10,12 @@ import sys
 import time
 from datetime import datetime
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+import plotly.graph_objects as go
+import plotly.express as px
+import pandas as pd
+import networkx as nx
+from collections import defaultdict
 
 # Add the project path
 sys.path.insert(0, '/home/duck/Documents/brain cluster ai')
@@ -26,10 +31,10 @@ from digital_cortex.frontal_lobe import FrontalLobe
 
 
 class ChappyBrainGUI:
-    """Main GUI controller for Chappy the Brain Cluster."""
+    """Enhanced GUI controller for Chappy the Brain Cluster with advanced visualization."""
 
     def __init__(self):
-        """Initialize Chappy's brain components."""
+        """Initialize Chappy's brain components with enhanced tracking."""
         self.colosseum = None
         self.neuron_pool = None
         self.memory_palace = None
@@ -39,6 +44,13 @@ class ChappyBrainGUI:
         self.learner = None
         self.thought_history = []
         self.current_state = "sleeping"
+
+        # Enhanced tracking for visualization
+        self.neuron_activations = []  # Track neuron firing patterns
+        self.confidence_history = []  # Track confidence over time
+        self.decision_history = []    # Track major decisions
+        self.reasoning_paths = []     # Track reasoning chains
+        self.current_neuron_details = {}  # Detailed neuron information
 
     def initialize_brain(self):
         """Initialize all brain components."""
@@ -142,6 +154,13 @@ class ChappyBrainGUI:
         # Step 4: Neuron processing with memory context
         self.current_state = "thinking"
 
+        # Track reasoning path
+        self.reasoning_paths.append([{
+            'component': 'Memory',
+            'action': f'Retrieved {len(relevant_memories)} memories',
+            'timestamp': datetime.now().isoformat()
+        }])
+
         # Enhance the user input with memory context for neurons
         enhanced_prompt = user_input
         if memory_context["context_available"]:
@@ -158,22 +177,52 @@ class ChappyBrainGUI:
 
         neuron_messages = self.neuron_pool.process_parallel(enhanced_prompt)
 
+        # Track neuron activations
         for msg in neuron_messages:
             self.add_thought("🧠", f"{msg.source}: {msg.content[:150]}... (memory-enhanced)", "neuron")
             self.colosseum.add_message(msg)
+
+            # Track activation
+            self.neuron_activations.append({
+                'neuron': msg.source,
+                'timestamp': datetime.now().isoformat(),
+                'confidence': msg.confidence,
+                'content_length': len(msg.content)
+            })
+
+            # Update reasoning path
+            self.reasoning_paths[-1].append({
+                'component': msg.source,
+                'action': f'Generated response (conf: {msg.confidence:.2f})',
+                'timestamp': datetime.now().isoformat()
+            })
 
         # Step 5: Find consensus
         self.current_state = "finding_consensus"
         winner, metadata = self.colosseum.find_consensus()
 
         if winner:
-            self.add_thought("🏆", f"Consensus reached: {winner.content[:100]}...", "consensus")
+            # Track confidence
+            self.confidence_history.append({
+                'timestamp': datetime.now().isoformat(),
+                'confidence': winner.confidence,
+                'source': winner.source
+            })
+
+            self.add_thought("🏆", f"Consensus reached: {winner.content[:100]}... (conf: {winner.confidence:.2f})", "consensus")
+
+            # Update reasoning path
+            self.reasoning_paths[-1].append({
+                'component': 'Colosseum',
+                'action': f'Consensus found with {winner.source} (conf: {winner.confidence:.2f})',
+                'timestamp': datetime.now().isoformat()
+            })
 
             # Step 6: Learning
             contributing_neurons = metadata.get('contributing_neurons', [winner.source])
             outcome_score = 0.7  # Assume positive interaction
             self.learner.update_contributing_neurons(contributing_neurons, outcome_score)
-            
+
             # Update attention weights for future consensus
             for neuron in contributing_neurons:
                 self.colosseum.update_neuron_performance(neuron, outcome_score)
@@ -187,6 +236,13 @@ class ChappyBrainGUI:
             memory_address = self.memory_palace.store_memory(winner, outcome_data)
             self.add_thought("🧠", f"Stored memory at: {memory_address}", "memory")
 
+            # Update reasoning path
+            self.reasoning_paths[-1].append({
+                'component': 'Memory',
+                'action': f'Stored outcome at {memory_address}',
+                'timestamp': datetime.now().isoformat()
+            })
+
             # Step 8: Executive decision (if needed) with memory context
             if assessment.get('threat_level', 0) > 0.3 or assessment.get('urgency', 0) > 0.3:
                 self.current_state = "making_decision"
@@ -194,7 +250,24 @@ class ChappyBrainGUI:
                 decision = self.frontal_lobe.make_executive_decision(
                     winner, assessment, sensory_msg.metadata, relevant_memories, actions
                 )
+
+                # Track decision
+                self.decision_history.append({
+                    'timestamp': datetime.now().isoformat(),
+                    'decision': decision.decision,
+                    'reasoning': decision.reasoning,
+                    'threat_level': assessment.get('threat_level', 0),
+                    'urgency': assessment.get('urgency', 0)
+                })
+
                 self.add_thought("🎯", f"Executive decision: {decision.decision} (memory-informed)", "executive")
+
+                # Update reasoning path
+                self.reasoning_paths[-1].append({
+                    'component': 'Frontal Lobe',
+                    'action': f'Executive decision: {decision.decision}',
+                    'timestamp': datetime.now().isoformat()
+                })
 
             self.current_state = "ready"
             return winner.content
@@ -236,6 +309,8 @@ class ChappyBrainGUI:
 
         # Use the memory manager's retrieve method
         return self.memory_palace.retrieve_relevant_memories(current_input, limit)
+
+    def shutdown_brain(self):
         """Gracefully shut down Chappy's brain components."""
         self.add_thought("😴", "Initiating shutdown sequence...", "system")
 
@@ -258,6 +333,171 @@ class ChappyBrainGUI:
 
         self.current_state = "sleeping"
         self.add_thought("🌙", "Chappy's brain has been shut down. Sweet dreams!", "system")
+
+    def create_thought_graph(self):
+        """Create a real-time visualization of neuron activations and thought patterns."""
+        if not self.neuron_activations:
+            return None
+
+        # Create a network graph of neuron interactions
+        G = nx.Graph()
+
+        # Add nodes for neurons
+        neuron_names = set()
+        for activation in self.neuron_activations[-20:]:  # Last 20 activations
+            neuron_names.add(activation.get('neuron', 'unknown'))
+
+        for neuron in neuron_names:
+            G.add_node(neuron, size=20, color='lightblue')
+
+        # Add edges based on recent interactions
+        recent_activations = self.neuron_activations[-10:]
+        for i in range(len(recent_activations)-1):
+            neuron1 = recent_activations[i].get('neuron', 'unknown')
+            neuron2 = recent_activations[i+1].get('neuron', 'unknown')
+            if neuron1 != neuron2:
+                if G.has_edge(neuron1, neuron2):
+                    G[neuron1][neuron2]['weight'] += 1
+                else:
+                    G.add_edge(neuron1, neuron2, weight=1)
+
+        # Create Plotly figure
+        pos = nx.spring_layout(G, seed=42)
+
+        edge_x = []
+        edge_y = []
+        for edge in G.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x.extend([x0, x1, None])
+            edge_y.extend([y0, y1, None])
+
+        edge_trace = go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=0.5, color='#888'),
+            hoverinfo='none',
+            mode='lines')
+
+        node_x = []
+        node_y = []
+        node_text = []
+        node_size = []
+        for node in G.nodes():
+            x, y = pos[node]
+            node_x.append(x)
+            node_y.append(y)
+            node_text.append(node)
+            node_size.append(G.degree(node) * 5 + 20)
+
+        node_trace = go.Scatter(
+            x=node_x, y=node_y,
+            mode='markers+text',
+            hoverinfo='text',
+            text=node_text,
+            textposition="top center",
+            marker=dict(
+                size=node_size,
+                color='lightblue',
+                line_width=2))
+
+        fig = go.Figure(data=[edge_trace, node_trace],
+                       layout=go.Layout(
+                           title="🧠 Neuron Activation Network",
+                           showlegend=False,
+                           hovermode='closest',
+                           margin=dict(b=20,l=5,r=5,t=40),
+                           xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                           yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                       )
+        return fig
+
+    def create_confidence_chart(self):
+        """Create a confidence trend chart over time."""
+        if not self.confidence_history:
+            return None
+
+        # Prepare data for plotting
+        df = pd.DataFrame(self.confidence_history[-20:])  # Last 20 confidence readings
+
+        if df.empty:
+            return None
+
+        fig = px.line(df, x='timestamp', y='confidence',
+                     title="📊 Confidence Trend",
+                     labels={'confidence': 'Confidence Level', 'timestamp': 'Time'},
+                     markers=True)
+
+        fig.update_layout(
+            xaxis_title="Time",
+            yaxis_title="Confidence (0-1)",
+            yaxis_range=[0, 1]
+        )
+
+        return fig
+
+    def create_reasoning_path_visualization(self):
+        """Create a visualization of the current reasoning path."""
+        if not self.reasoning_paths:
+            return None
+
+        # Get the most recent reasoning path
+        current_path = self.reasoning_paths[-1] if self.reasoning_paths else []
+
+        if not current_path:
+            return None
+
+        # Create a simple flowchart-like visualization
+        steps = []
+        for i, step in enumerate(current_path):
+            steps.append(f"{i+1}. {step.get('component', 'Unknown')}: {step.get('action', 'Processing')}")
+
+        # Create a text-based visualization for now (can be enhanced to graphical later)
+        path_text = "🔗 Current Reasoning Path:\n\n" + "\n→ ".join(steps)
+
+        return path_text
+
+    def get_neuron_details(self, neuron_name):
+        """Get detailed information about a specific neuron."""
+        if not self.neuron_pool:
+            return {}
+
+        neuron = self.neuron_pool.neurons.get(neuron_name)
+        if not neuron:
+            return {}
+
+        # Get activation history for this neuron
+        activations = [a for a in self.neuron_activations if a.get('neuron') == neuron_name]
+
+    def create_confidence_meter(self):
+        """Create a real-time confidence meter widget."""
+        if not self.confidence_history:
+            return None
+
+        latest_confidence = self.confidence_history[-1]['confidence']
+
+        # Create a gauge chart
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=latest_confidence,
+            title={'text': "Current Confidence"},
+            gauge={
+                'axis': {'range': [0, 1]},
+                'bar': {'color': "darkblue"},
+                'steps': [
+                    {'range': [0, 0.3], 'color': "red"},
+                    {'range': [0.3, 0.7], 'color': "yellow"},
+                    {'range': [0.7, 1], 'color': "green"}
+                ],
+                'threshold': {
+                    'line': {'color': "black", 'width': 4},
+                    'thickness': 0.75,
+                    'value': latest_confidence
+                }
+            }
+        ))
+
+        fig.update_layout(height=200)
+        return fig
 
 
 def main():
@@ -321,6 +561,14 @@ def main():
                 st.metric("Total Thoughts", status['thoughts'])
             with col2:
                 st.metric("Memories Stored", status['memories'].get('total_memories', 0))
+
+            # Real-time confidence meter
+            st.subheader("🎯 Current Confidence")
+            confidence_meter = chappy.create_confidence_meter()
+            if confidence_meter:
+                st.plotly_chart(confidence_meter, use_container_width=True)
+            else:
+                st.info("No confidence data yet")
 
             st.subheader("Recent Thoughts")
             thoughts = chappy.get_recent_thoughts(5)
@@ -398,6 +646,135 @@ def main():
                         st.error(error_msg)
                         chappy.add_thought("❌", f"Error: {e}", "error")
                         st.session_state.messages.append({"role": "assistant", "content": error_msg})
+
+    # Advanced Visualizations Section
+    if chappy.current_state != "sleeping":
+        st.header("📊 Brain Visualizations")
+
+        # Create tabs for different visualizations
+        tab1, tab2, tab3, tab4 = st.tabs(["🧠 Thought Graph", "📈 Confidence", "🔗 Reasoning Path", "📚 History"])
+
+        with tab1:
+            st.subheader("Neuron Activation Network")
+            thought_graph = chappy.create_thought_graph()
+            if thought_graph:
+                st.plotly_chart(thought_graph, use_container_width=True)
+            else:
+                st.info("No neuron activations to visualize yet. Start a conversation to see the thought graph!")
+
+        with tab2:
+            st.subheader("Confidence Over Time")
+            confidence_chart = chappy.create_confidence_chart()
+            if confidence_chart:
+                st.plotly_chart(confidence_chart, use_container_width=True)
+            else:
+                st.info("No confidence data yet. Chappy needs to process some inputs first!")
+
+        with tab3:
+            st.subheader("Current Reasoning Path")
+            reasoning_viz = chappy.create_reasoning_path_visualization()
+            if reasoning_viz:
+                st.markdown(reasoning_viz)
+            else:
+                st.info("No active reasoning path. Ask Chappy something to see the process!")
+
+            # Interactive neuron details
+            st.subheader("🔍 Neuron Inspector")
+            if chappy.neuron_pool and chappy.neuron_pool.neurons:
+                neuron_names = list(chappy.neuron_pool.neurons.keys())
+                selected_neuron = st.selectbox("Select a neuron to inspect:", neuron_names)
+                if selected_neuron:
+                    details = chappy.get_neuron_details(selected_neuron)
+                    if details:
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric("Activations", details['activation_count'])
+                            st.metric("Avg Confidence", f"{details['avg_confidence']:.2f}")
+                        with col2:
+                            st.write(f"**Model:** {details['model']}")
+                            st.write(f"**Temperature:** {details['temperature']}")
+
+                        if details['recent_activations']:
+                            st.subheader("Recent Activations")
+                            for activation in details['recent_activations']:
+                                with st.expander(f"Activation at {activation['timestamp'][:19]}"):
+                                    st.write(f"**Confidence:** {activation['confidence']:.3f}")
+                                    st.write(f"**Content Length:** {activation['content_length']} characters")
+
+                                    # Find related thoughts for this activation
+                                    related_thoughts = [t for t in chappy.thought_history[-20:]
+                                                      if t['type'] == 'neuron' and selected_neuron in t['content']]
+                                    if related_thoughts:
+                                        st.write("**Related Thoughts:**")
+                                        for thought in related_thoughts[-3:]:  # Last 3 related thoughts
+                                            st.write(f"• {thought['content'][:100]}...")
+
+        with tab4:
+            st.subheader("Decision History")
+            if chappy.decision_history:
+                for i, decision in enumerate(chappy.decision_history[-10:]):  # Last 10 decisions
+                    with st.expander(f"Decision {len(chappy.decision_history)-i}: {decision['decision']}"):
+                        st.write(f"**Time:** {decision['timestamp'][:19]}")
+                        st.write(f"**Reasoning:** {decision['reasoning']}")
+                        st.write(f"**Threat Level:** {decision['threat_level']:.2f}")
+                        st.write(f"**Urgency:** {decision['urgency']:.2f}")
+            else:
+                st.info("No executive decisions made yet.")
+
+            st.subheader("Export Data")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                if st.button("📊 Export Confidence Data"):
+                    if chappy.confidence_history:
+                        df = pd.DataFrame(chappy.confidence_history)
+                        csv = df.to_csv(index=False)
+                        st.download_button(
+                            label="Download CSV",
+                            data=csv,
+                            file_name="confidence_history.csv",
+                            mime="text/csv"
+                        )
+                    else:
+                        st.warning("No confidence data to export")
+
+            with col2:
+                if st.button("🧠 Export Neuron Data"):
+                    if chappy.neuron_activations:
+                        df = pd.DataFrame(chappy.neuron_activations)
+                        csv = df.to_csv(index=False)
+                        st.download_button(
+                            label="Download CSV",
+                            data=csv,
+                            file_name="neuron_activations.csv",
+                            mime="text/csv"
+                        )
+                    else:
+                        st.warning("No neuron data to export")
+
+            with col3:
+                if st.button("📋 Export Thoughts"):
+                    if chappy.thought_history:
+                        df = pd.DataFrame(chappy.thought_history)
+                        csv = df.to_csv(index=False)
+                        st.download_button(
+                            label="Download CSV",
+                            data=csv,
+                            file_name="thought_history.csv",
+                            mime="text/csv"
+                        )
+                    else:
+                        st.warning("No thought data to export")
+
+            st.subheader("Memory Palace Summary")
+            if chappy.memory_palace:
+                memory_summary = chappy.memory_palace.get_chain_summary()
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Total Memories", memory_summary.get('total_memories', 0))
+                with col2:
+                    st.metric("Active Chains", memory_summary.get('active_chains', 0))
+                with col3:
+                    st.metric("Avg Relevance", f"{memory_summary.get('avg_relevance', 0):.2f}")
 
     # Live thought stream
     if chappy.current_state != "sleeping":
