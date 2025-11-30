@@ -1,0 +1,29 @@
+{
+  "vision": {
+    "enabled": true,
+    "device": "/dev/video0",
+    "resolution": [640, 480],
+    "fps": 10,
+    "motion_threshold": 0.01
+  },
+  "audio": {
+    "enabled": true,
+    "device": null,
+    "sample_rate": 16000,
+    "channels": 1,
+    "language": "en-US",
+    "energy_threshold": 300
+  },
+  "system": {
+    "enabled": true,
+    "cpu_threshold": 80.0,
+    "memory_threshold": 85.0,
+    "disk_threshold": 90.0,
+    "monitor_interval": 5
+  },
+  "text": {
+    "enabled": true,
+    "max_length": 10000,
+    "rate_limit": 10
+  }
+}
