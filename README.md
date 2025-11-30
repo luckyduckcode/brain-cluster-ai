@@ -84,40 +84,48 @@ pip install -r requirements.txt
 - `whisper` - Audio transcription (handled by yt-dlp integration)
 
 ### 🖥️ **Standalone Desktop App - NEW!**
-**Status:** Complete - Modern Native Application
+**Status:** Complete - Simple & User-Friendly
 
 **What was built:**
-- **CustomTkinter Interface**: Beautiful, modern desktop app with dark/light themes
-- **Tabbed Interface**: Chat, Learning, Memory, and System monitoring tabs
-- **Real-time Chat**: Direct integration with Chappy's brain without web browser
-- **Video Learning**: Integrated YouTube learning with progress tracking
-- **Memory Visualization**: View and manage Chappy's learned knowledge
-- **System Monitoring**: Real-time brain status and performance metrics
-- **Native Performance**: No browser overhead, direct Python execution
+- **Clean Interface**: Simple, welcoming desktop app focused on chat
+- **Easy Chat**: Large chat area with clear message formatting
+- **Smart Initialization**: Background brain loading with status updates
+- **User-Friendly Design**: No complex tabs, just chat and status
+- **Modern UI**: CustomTkinter with automatic themes
 
 **Features:**
-- 💬 Real-time chat with Chappy's multimodal brain
-- 🎥 One-click YouTube video learning
-- 🧠 Memory palace visualization
-- 📊 Live system monitoring
-- 🎨 Modern UI with automatic dark/light theme detection
-- ⌨️ Keyboard shortcuts (Ctrl+N for new chat, Ctrl+Q to quit)
-- 💾 Conversation saving and export
+- 💬 **Simple Chat Interface**: Clean, easy-to-use chat with Chappy
+- 🧠 **Smart AI Companion**: Brain-inspired multimodal AI with personality
+- 🎨 **Modern UI**: Automatic dark/light theme with friendly design
+- ⚡ **Fast Startup**: Quick initialization with clear status messages
+- 🎯 **User-Friendly**: No complex tabs or technical jargon
 
 **Usage:**
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
-# Launch Standalone Desktop App
+# Launch the simple desktop app
 python3 launch_chappy_standalone.py
 
 # Or run directly
-python3 chappy_standalone.py
+python3 chappy_standalone_simple.py
 
 # Test the installation
 python3 test_standalone.py
 ```
+
+**What You'll See:**
+- **Welcome Screen**: Friendly greeting and introduction
+- **Chat Area**: Large, clear chat window for conversations
+- **Input Box**: Simple text entry with big "Send" button
+- **Status Bar**: Clear messages about Chappy's brain status
+
+**Perfect for:**
+- First-time AI users
+- Casual conversations with AI
+- Educational demonstrations
+- Quick AI interactions
 
 **Features:**
 - 💬 Real-time chat with Chappy's multimodal brain

@@ -2,7 +2,7 @@
 """
 Chappy Desktop Launcher
 
-Launches the standalone Chappy desktop application.
+Launches the simple, user-friendly Chappy desktop application.
 """
 
 import sys
@@ -15,9 +15,9 @@ def main():
     current_dir = Path(__file__).parent
     sys.path.insert(0, str(current_dir))
 
-    # Import and run the desktop app
+    # Import and run the simple desktop app
     try:
-        from chappy_standalone import main as run_desktop
+        from chappy_standalone_simple import main as run_desktop
         run_desktop()
     except ImportError as e:
         print(f"Error importing Chappy desktop: {e}")

@@ -2,10 +2,12 @@
 Version=1.0
 Type=Application
 Name=Chappy AI
-Comment=Digital Cortex AI Companion
+Comment=Your friendly AI companion with a brain inspired by biology
 Exec=python3 /home/duck/Documents/brain cluster ai/launch_chappy_standalone.py
 Icon=/home/duck/Documents/brain cluster ai/chappy_icon.png
 Terminal=false
 Categories=Education;Science;AI;
+Keywords=AI;AGI;Chatbot;Learning;
+StartupWMClass=ChappyDesktop
 Keywords=AI;AGI;Chatbot;Learning;
 StartupWMClass=ChappyDesktop
