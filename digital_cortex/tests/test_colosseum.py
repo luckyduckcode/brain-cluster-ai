@@ -116,6 +116,73 @@ def test_single_message():
     print("=" * 60)
 
 
+def test_attention_consensus():
+    """Test attention-based consensus mechanism."""
+    print("\n\n" + "=" * 60)
+    print("Testing Corpus Colosseum - Attention-Based Consensus")
+    print("=" * 60)
+    
+    colosseum = CorpusColosseum()
+    
+    # Add messages from different neurons
+    msg1 = Message.create("neuron1", "Answer A", 0.8)
+    msg2 = Message.create("neuron2", "Answer A", 0.7)  # Same answer, lower confidence
+    msg3 = Message.create("neuron3", "Answer B", 0.9)  # Different answer, higher confidence
+    
+    colosseum.add_message(msg1)
+    colosseum.add_message(msg2)
+    colosseum.add_message(msg3)
+    
+    print(f"✓ Added 3 messages from neurons with different answers")
+    
+    # Test attention consensus
+    winner, metadata = colosseum.find_consensus(method="attention")
+    
+    print(f"\n🏆 WINNER: {winner.source}")
+    print(f"   Content: {winner.content}")
+    print(f"   Confidence: {winner.confidence:.2f}")
+    print(f"\n📊 Metadata:")
+    print(f"   Method: {metadata['method']}")
+    print(f"   Total messages: {metadata['total_messages']}")
+    print(f"   Winning group size: {metadata['winning_group_size']}")
+    
+    # Should favor the group with higher combined attention weight
+    # neuron1 + neuron2 both say "Answer A"
+    assert winner.content == "Answer A", f"Expected 'Answer A', got '{winner.content}'"
+    
+    print("\n✓ Attention consensus test passed!")
+    print("=" * 60)
+
+
+def test_attention_learning():
+    """Test that attention weights update over time."""
+    print("\n\n" + "=" * 60)
+    print("Testing Attention Learning")
+    print("=" * 60)
+    
+    colosseum = CorpusColosseum()
+    
+    # Check initial weights
+    initial_weights = colosseum.get_attention_weights()
+    print(f"Initial attention weights: {initial_weights}")
+    
+    # Simulate positive performance for neuron1
+    colosseum.update_neuron_performance("neuron1", 0.5)
+    colosseum.update_neuron_performance("neuron1", 0.5)
+    
+    # Check updated weights
+    updated_weights = colosseum.get_attention_weights()
+    print(f"Updated attention weights: {updated_weights}")
+    
+    # neuron1 should have higher weight now
+    assert updated_weights["neuron1"] > initial_weights.get("neuron1", 1.0), "Weight should have increased"
+    
+    print("\n✓ Attention learning test passed!")
+    print("=" * 60)
+
+
 if __name__ == "__main__":
     test_basic_consensus()
     test_single_message()
+    test_attention_consensus()
+    test_attention_learning()

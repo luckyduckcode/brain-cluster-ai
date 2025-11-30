@@ -30,14 +30,18 @@ class TestAttentionVoter(unittest.TestCase):
         self.assertIn(winner.source, ["neuron1", "neuron2"])
         self.assertEqual(metadata["method"], "attention_weighted_vote")
 
-    def test_update_weights(self):
-        initial_weight = self.voter.neuron_weights["neuron1"]
+    def test_attention_learning(self):
+        """Test that attention weights improve with positive feedback."""
+        # Initial weights should be 1.0
+        initial_weights = self.voter.get_weights()
         
-        # Positive performance
+        # Simulate positive performance for neuron1
         self.voter.update_weights("neuron1", 0.5)
-        new_weight = self.voter.neuron_weights["neuron1"]
+        self.voter.update_weights("neuron1", 0.5)
         
-        self.assertGreater(new_weight, initial_weight)
+        # Weight should have increased
+        updated_weights = self.voter.get_weights()
+        self.assertGreater(updated_weights["neuron1"], initial_weights.get("neuron1", 1.0))
 
 class TestHierarchicalConsensus(unittest.TestCase):
     def setUp(self):
