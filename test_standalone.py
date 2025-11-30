@@ -15,11 +15,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 def test_imports():
     """Test that all required modules can be imported."""
     try:
-        from chappy_standalone import ChappyDesktopApp
+        from chappy_standalone_simple import ChappyDesktopApp
         print("✓ ChappyDesktopApp imported successfully")
 
-        from chappy_gui import ChappyBrainGUI
-        print("✓ ChappyBrainGUI imported successfully")
+        from chappy_standalone_simple import ChappyBrain
+        print("✓ ChappyBrain imported successfully")
 
         import customtkinter as ctk
         print("✓ CustomTkinter available")
@@ -41,9 +41,9 @@ def test_imports():
 def test_brain_initialization():
     """Test brain initialization without GUI."""
     try:
-        from chappy_gui import ChappyBrainGUI
-        brain = ChappyBrainGUI()
-        print("✓ ChappyBrainGUI instance created")
+        from chappy_standalone_simple import ChappyBrain
+        brain = ChappyBrain()
+        print("✓ ChappyBrain instance created")
 
         # Test basic attributes
         assert hasattr(brain, 'neuron_pool')
