@@ -20,6 +20,9 @@ def main():
     # Change to project directory
     os.chdir(script_dir)
 
+    # Add current directory to Python path for imports
+    sys.path.insert(0, script_dir)
+
     # Run the dashboard
     try:
         subprocess.run([sys.executable, 'core/observability_dashboard.py'])

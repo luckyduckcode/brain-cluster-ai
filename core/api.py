@@ -17,7 +17,7 @@ from datetime import datetime
 import uvicorn
 
 # Add the project path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from digital_cortex.corpus_colosseum import CorpusColosseum
 from digital_cortex.utils.llm_neuron import NeuronPool

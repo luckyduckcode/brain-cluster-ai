@@ -15,7 +15,7 @@ from pathlib import Path
 from datetime import datetime
 
 # Add project path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from digital_cortex.corpus_colosseum import CorpusColosseum
 from digital_cortex.utils.llm_neuron import NeuronPool
