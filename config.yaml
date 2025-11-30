@@ -1,0 +1,50 @@
+# Digital Cortex Configuration
+
+# Model Settings
+models:
+  default: "llama3.2:1b"
+  high_complexity: "llama3.2:3b"  # For complex reasoning tasks
+  fast: "llama3.2:1b"              # For quick responses
+  
+# Ollama Connection
+ollama:
+  url: "http://localhost:11434"
+  timeout: 60
+
+# Neuron Settings
+neurons:
+  default_temperature: 0.7
+  confidence_extraction: true
+  
+# Caching
+cache:
+  enabled: true
+  max_size: 100
+  similarity_threshold: 0.95
+  
+# Consensus (Corpus Colosseum)
+consensus:
+  dbscan_eps: 0.3
+  dbscan_min_samples: 2
+  max_capacity: 100
+  
+# Memory Palace
+memory:
+  room_capacity: 512
+  
+# Meta-Cognition
+meta_cognition:
+  confusion_threshold: 0.7
+  uncertainty_threshold: 0.6
+  
+# Motor Cortex
+motor_cortex:
+  sandbox_dir: "./sandbox"
+  command_timeout: 5
+  
+# Feedback/Learning
+learning:
+  learning_rate: 0.1
+  weight_min: 0.1
+  weight_max: 2.0
+  storage_path: "neuron_weights.json"
