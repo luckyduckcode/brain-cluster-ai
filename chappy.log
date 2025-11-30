@@ -1,0 +1,62 @@
+nohup: ignoring input
+
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.1.162:8501
+  External URL: http://96.29.13.154:8501
+
+INFO:digital_cortex.corpus_colosseum.colosseum:Corpus Colosseum initialized (dim=128, eps=0.4)
+INFO:digital_cortex.utils.llm_neuron:NeuronPool initialized
+INFO:digital_cortex.memory_palace.palace_chain:Created Memory Room #0
+INFO:digital_cortex.memory_palace.palace_chain:Created new room #0 in chain
+INFO:digital_cortex.memory_palace.palace_chain:Memory Palace Chain initialized
+INFO:digital_cortex.sensorium:Sensorium initialized
+INFO:digital_cortex.amygdala:Amygdala initialized with threat assessment capabilities
+INFO:digital_cortex.utils.llm_neuron:LLM-Neuron 'Frontal_Lobe_Executive' initialized (model=llama3.2:1b)
+INFO:digital_cortex.frontal_lobe:Frontal Lobe initialized with llama3.2:1b (executive decision-making)
+INFO:digital_cortex.feedback.learner:Weight Learner initialized (loaded 4 weights)
+INFO:digital_cortex.utils.llm_neuron:LLM-Neuron 'Curious_Chappy' initialized (model=llama3.2:1b)
+INFO:digital_cortex.utils.llm_neuron:Added neuron 'Curious_Chappy' to pool
+INFO:digital_cortex.utils.llm_neuron:LLM-Neuron 'Wise_Chappy' initialized (model=llama3.2:1b)
+INFO:digital_cortex.utils.llm_neuron:Added neuron 'Wise_Chappy' to pool
+INFO:digital_cortex.utils.llm_neuron:LLM-Neuron 'Creative_Chappy' initialized (model=llama3.2:1b)
+INFO:digital_cortex.utils.llm_neuron:Added neuron 'Creative_Chappy' to pool
+INFO:digital_cortex.utils.llm_neuron:LLM-Neuron 'Practical_Chappy' initialized (model=llama3.2:1b)
+INFO:digital_cortex.utils.llm_neuron:Added neuron 'Practical_Chappy' to pool
+INFO:digital_cortex.sensorium:Processed text input: 1 words, confidence 0.30
+INFO:digital_cortex.amygdala:Amygdala assessment: threat=0.00, urgency=0.00, valence=0.00
+INFO:digital_cortex.amygdala:Amygdala processed message from Sensorium_user_input: threat=0.00
+INFO:digital_cortex.utils.llm_neuron:Processing with 4 neurons
+INFO:digital_cortex.corpus_colosseum.colosseum:Consensus found: Curious_Chappy (confidence=0.80)
+INFO:digital_cortex.feedback.learner:Updated weight for Curious_Chappy: 1.28 -> 1.35 (score=0.7)
+INFO:digital_cortex.memory_palace.palace_chain:Stored memory at 0:3_6_4
+INFO:digital_cortex.sensorium:Processed text input: 5 words, confidence 0.30
+INFO:digital_cortex.amygdala:Amygdala assessment: threat=0.00, urgency=0.30, valence=0.00
+INFO:digital_cortex.amygdala:Amygdala processed message from Sensorium_user_input: threat=0.00
+INFO:digital_cortex.utils.llm_neuron:Processing with 4 neurons
+INFO:digital_cortex.corpus_colosseum.colosseum:Consensus found: Curious_Chappy (confidence=0.80)
+INFO:digital_cortex.feedback.learner:Updated weight for Curious_Chappy: 1.35 -> 1.42 (score=0.7)
+INFO:digital_cortex.memory_palace.palace_chain:Stored memory at 0:3_6_5
+INFO:digital_cortex.sensorium:Processed text input: 4 words, confidence 0.30
+INFO:digital_cortex.amygdala:Amygdala assessment: threat=0.00, urgency=0.00, valence=0.40
+INFO:digital_cortex.amygdala:Amygdala processed message from Sensorium_user_input: threat=0.00
+INFO:digital_cortex.utils.llm_neuron:Processing with 4 neurons
+INFO:digital_cortex.corpus_colosseum.colosseum:Consensus found: Wise_Chappy (confidence=0.90)
+INFO:digital_cortex.feedback.learner:Updated weight for Wise_Chappy: 1.00 -> 1.07 (score=0.7)
+INFO:digital_cortex.memory_palace.palace_chain:Stored memory at 0:1_8_6
+INFO:digital_cortex.sensorium:Processed text input: 2 words, confidence 0.30
+INFO:digital_cortex.amygdala:Amygdala assessment: threat=0.00, urgency=0.00, valence=0.00
+INFO:digital_cortex.amygdala:Amygdala processed message from Sensorium_user_input: threat=0.00
+INFO:digital_cortex.utils.llm_neuron:Processing with 4 neurons
+INFO:digital_cortex.corpus_colosseum.colosseum:Consensus found: Wise_Chappy (confidence=0.90)
+INFO:digital_cortex.feedback.learner:Updated weight for Wise_Chappy: 1.07 -> 1.14 (score=0.7)
+INFO:digital_cortex.memory_palace.palace_chain:Stored memory at 0:1_8_7
+  Stopping...
+🧠 Starting Chappy the Brain Cluster GUI...
+Make sure Ollama is running: 'ollama serve'
+And you have the model: 'ollama pull llama3.2:1b'
+
