@@ -25,9 +25,10 @@ from digital_cortex.amygdala import Amygdala
 from digital_cortex.frontal_lobe import FrontalLobe
 from digital_cortex.feedback.learner import WeightLearner
 from digital_cortex.learning_center import VideoLearningContainer
+from digital_cortex.rag_memory import ChappyRAGMemory, WebSearchTool, VideoUnderstandingTool
 
 class ChappyBrain:
-    """Minimal brain class for standalone desktop app."""
+    """Enhanced brain class with RAG memory system."""
 
     def __init__(self):
         """Initialize Chappy's brain components."""
@@ -44,19 +45,203 @@ class ChappyBrain:
         self.reasoning_paths = []
         self.decision_history = []
 
-    async def process_input_async(self, user_input):
-        """Process user input asynchronously."""
+        # Initialize RAG memory system
+        self.rag_memory = None
+        self.web_search = None
+        self.video_tool = None
+
+        # Initialize RAG components
+        self._initialize_rag_system()
+
+        # Initialize RAG components
+        self._initialize_rag_system()
+
+    def _initialize_rag_system(self):
+        """Initialize the RAG memory system and tools."""
         try:
-            # Simple processing - just use the neuron pool for now
+            # Initialize RAG memory
+            self.rag_memory = ChappyRAGMemory(persist_directory="./chappy_memory")
+
+            # Initialize web search tool
+            self.web_search = WebSearchTool()
+
+            # Initialize video understanding tool
+            self.video_tool = VideoUnderstandingTool()
+
+            print("🧠 RAG Memory System initialized successfully")
+        except Exception as e:
+            print(f"⚠️  RAG Memory System initialization failed: {e}")
+            print("Chappy will work with limited memory capabilities")
+
+    async def process_input_async(self, user_input):
+        """Process user input asynchronously with RAG memory."""
+        try:
+            # Check for video URLs
+            if self._contains_video_url(user_input):
+                return await self._handle_video_request(user_input)
+
+            # Check for web search requests
+            if self._should_search_web(user_input):
+                return await self._handle_web_search(user_input)
+
+            # Retrieve relevant memories for context
+            context_memories = []
+            if self.rag_memory:
+                context_memories = self.rag_memory.retrieve_relevant_memories(
+                    user_input, n_results=3
+                )
+
+            # Build context from memories
+            context = self._build_context_from_memories(context_memories)
+
+            # Generate response using neuron pool
             if self.neuron_pool and len(self.neuron_pool.neurons) > 0:
-                # Get response from first available neuron
                 neuron = list(self.neuron_pool.neurons.values())[0]
-                response = await neuron.process_async(user_input)
-                return response.content if hasattr(response, 'content') else str(response)
+
+                # Create enhanced prompt with context
+                enhanced_prompt = self._create_enhanced_prompt(user_input, context)
+                response = await neuron.process_async(enhanced_prompt)
+                response_content = response.content if hasattr(response, 'content') else str(response)
+
+                # Store conversation in RAG memory
+                if self.rag_memory:
+                    self.rag_memory.store_conversation(user_input, response_content)
+
+                return response_content
             else:
                 return "Hello! I'm Chappy, but my brain isn't fully initialized yet. Please wait a moment for me to wake up!"
         except Exception as e:
             return f"Sorry, I encountered an error: {str(e)}"
+
+    def _contains_video_url(self, text: str) -> bool:
+        """Check if text contains a video URL."""
+        import re
+        video_patterns = [
+            r'youtube\.com/watch\?v=',
+            r'youtu\.be/',
+            r'youtube\.com/embed/',
+            r'vimeo\.com/',
+            r'tiktok\.com/'
+        ]
+        return any(re.search(pattern, text, re.IGNORECASE) for pattern in video_patterns)
+
+    def _should_search_web(self, text: str) -> bool:
+        """Check if user is requesting a web search."""
+        search_keywords = [
+            'search for', 'look up', 'find information about',
+            'what is', 'who is', 'how to', 'tell me about'
+        ]
+        return any(keyword in text.lower() for keyword in search_keywords)
+
+    async def _handle_video_request(self, user_input: str) -> str:
+        """Handle video-related requests."""
+        if not self.video_tool:
+            return "I can't view videos directly, but I'd love to hear about it! What happens in the video? 🎥"
+
+        # Extract URL from input
+        import re
+        url_match = re.search(r'https?://[^\s]+', user_input)
+        if url_match:
+            url = url_match.group(0)
+            response = self.video_tool.handle_video_request(url)
+
+            # Store video interaction in memory
+            if self.rag_memory:
+                self.rag_memory.store_conversation(
+                    user_input,
+                    response,
+                    {"interaction_type": "video_request", "url": url}
+                )
+
+            return response
+        else:
+            return "I see you're asking about a video, but I couldn't find a URL in your message. Could you share the video link?"
+
+    async def _handle_web_search(self, user_input: str) -> str:
+        """Handle web search requests."""
+        if not self.web_search:
+            return "I'm sorry, but web search is not available right now. I'll try to help with what I know!"
+
+        try:
+            # Extract search query
+            query = self._extract_search_query(user_input)
+
+            # Perform search
+            search_results = self.web_search.search(query, max_results=3)
+
+            if not search_results:
+                return f"I couldn't find information about '{query}' online. Let me try to help with what I know instead."
+
+            # Store search results in memory
+            if self.rag_memory:
+                self.rag_memory.search_web_and_store(query, search_results)
+
+            # Format response
+            response = f"I searched for '{query}' and found some information:\n\n"
+            for i, result in enumerate(search_results[:3], 1):
+                response += f"{i}. **{result['title']}**\n"
+                response += f"   {result['snippet'][:200]}...\n"
+                response += f"   Source: {result['url']}\n\n"
+
+            response += "Would you like me to search for something more specific?"
+
+            # Store conversation
+            if self.rag_memory:
+                self.rag_memory.store_conversation(
+                    user_input,
+                    response,
+                    {"interaction_type": "web_search", "query": query}
+                )
+
+            return response
+
+        except Exception as e:
+            return f"I tried to search for information, but encountered an error: {str(e)}"
+
+    def _extract_search_query(self, user_input: str) -> str:
+        """Extract search query from user input."""
+        # Remove common prefixes
+        prefixes_to_remove = [
+            'search for', 'look up', 'find information about',
+            'tell me about', 'what is', 'who is', 'how to'
+        ]
+
+        query = user_input.lower()
+        for prefix in prefixes_to_remove:
+            if query.startswith(prefix):
+                return user_input[len(prefix):].strip()
+
+        # If no prefix found, return the whole input
+        return user_input.strip()
+
+    def _build_context_from_memories(self, memories: list) -> str:
+        """Build context string from retrieved memories."""
+        if not memories:
+            return ""
+
+        context_parts = []
+        for memory in memories[:3]:  # Limit to top 3 memories
+            content = memory.get('content', '')
+            score = memory.get('similarity_score', 0)
+            if score > 0.05:  # Include memories with any reasonable relevance
+                context_parts.append(f"Previous conversation: {content}")
+
+        return "\n".join(context_parts)
+
+    def _create_enhanced_prompt(self, user_input: str, context: str) -> str:
+        """Create an enhanced prompt with context."""
+        if not context:
+            return user_input
+
+        enhanced_prompt = f"""Based on our previous conversations:
+
+{context}
+
+Current user message: {user_input}
+
+Please respond naturally, referencing our conversation history when relevant."""
+
+        return enhanced_prompt
 
     def process_input(self, user_input):
         """Process user input through Chappy's brain (synchronous wrapper)."""

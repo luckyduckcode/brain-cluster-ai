@@ -21,3 +21,9 @@ opencv-python>=4.8.0
 yt-dlp>=2023.11.0
 opencv-python>=4.8.0
 openai-whisper>=20231117
+
+# RAG Memory System Dependencies
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+ddgs>=5.0.0
+youtube-transcript-api>=0.6.0

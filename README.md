@@ -35,6 +35,55 @@ A brain-inspired multi-agent AI architecture using local LLMs as "neurons" and s
 "learning stats"
 ```
 
+### ✅ **RAG Memory System - COMPLETE**
+**Status:** 100% Complete
+
+**What was built:**
+- **Local Vector Database**: ChromaDB for persistent semantic memory storage
+- **Embedding Engine**: SentenceTransformers (all-MiniLM-L6-v2) for text vectorization
+- **Conversation Memory**: Automatic storage of all user-AI interactions
+- **Semantic Retrieval**: Context-aware memory search with similarity scoring
+- **Web Search Integration**: DuckDuckGo API for real-time information access
+- **Video Understanding**: YouTube transcript extraction and analysis
+- **Memory Palace Integration**: Persistent storage across sessions and restarts
+
+**Key Features:**
+- 🧠 **Persistent Memory**: Conversations survive app restarts and system reboots
+- 🔍 **Semantic Search**: Find relevant past conversations by meaning, not keywords
+- 🌐 **Web Integration**: Search the internet for current information
+- 🎥 **Video Learning**: Extract and remember content from YouTube videos
+- 📚 **Contextual Responses**: AI responses include relevant conversation history
+- 💾 **Local Storage**: All data stored locally, no cloud dependency
+
+**Usage:**
+```bash
+# Regular conversation with memory
+User: "My name is Alex"
+Chappy: "Nice to meet you, Alex!"
+
+User: "What's my name?"
+Chappy: "Your name is Alex! We just introduced ourselves."
+
+# Web search
+User: "search: latest Python news"
+Chappy: "Based on current web search results..."
+
+# Video understanding
+User: "analyze video: https://youtube.com/watch?v=VIDEO_ID"
+Chappy: "This video is about... [transcript analysis]"
+
+# Memory queries
+User: "what have we talked about?"
+Chappy: "We've discussed your name, preferences, and various topics..."
+```
+
+**Technical Implementation:**
+- **Vector Storage**: ChromaDB with persistent SQLite backend
+- **Embeddings**: 384-dimensional sentence embeddings for semantic similarity
+- **Collections**: Separate conversation and knowledge collections
+- **Similarity Threshold**: Adaptive scoring for relevant memory retrieval
+- **Context Injection**: Previous conversations included in AI prompts
+
 ### ✅ Core Components Implemented
 
 1. **Message Protocol** (`utils/message.py`)
@@ -83,6 +132,12 @@ pip install -r requirements.txt
 - `llava:7b` - Vision-language model for video frame analysis
 - `whisper` - Audio transcription (handled by yt-dlp integration)
 
+**RAG Memory System Dependencies:**
+- `chromadb>=0.4.0` - Local vector database for persistent memory
+- `sentence-transformers>=2.2.0` - Text embedding model for semantic search
+- `ddgs>=5.0.0` - DuckDuckGo search API for web integration
+- `youtube-transcript-api>=0.6.0` - YouTube transcript extraction
+
 ### 🖥️ **Standalone Desktop App - NEW!**
 **Status:** Complete - Simple & User-Friendly
 
@@ -129,8 +184,12 @@ python3 test_standalone.py
 
 **Features:**
 - 💬 Real-time chat with Chappy's multimodal brain
+- 🧠 **Persistent Memory**: Remembers conversations across sessions
+- 🔍 **Semantic Search**: Finds relevant past conversations by meaning
+- 🌐 **Web Search**: Real-time internet search for current information
 - 🎥 One-click YouTube video learning with progress tracking
-- 🧠 Memory palace visualization and management
+- 📼 **Video Understanding**: Extract and analyze YouTube transcripts
+- 🏛️ **Memory Palace**: Full RAG system with ChromaDB vector storage
 - 📊 Live system monitoring and brain status
 - 🎨 Modern UI with automatic dark/light theme detection
 - ⌨️ Keyboard shortcuts (Ctrl+N for new chat, Ctrl+Q to quit)
@@ -139,9 +198,10 @@ python3 test_standalone.py
 
 **System Requirements:**
 - Python 3.12+
-- 4GB RAM minimum, 8GB recommended
+- 4GB RAM minimum, 8GB recommended (6GB+ for RAG memory)
 - Ollama with llama3.2:1b model
 - For video learning: ffmpeg, yt-dlp, OpenCV
+- For RAG memory: ~500MB disk space for vector database
 
 **Desktop Integration (Linux):**
 ```bash
@@ -535,6 +595,7 @@ python3 demo_video_learning.py
 ```
 digital_cortex/
 ├── __init__.py
+├── rag_memory.py                 # RAG memory system with ChromaDB
 ├── corpus_colosseum/
 │   ├── __init__.py
 │   ├── attention_consensus.py    # Advanced consensus mechanisms
