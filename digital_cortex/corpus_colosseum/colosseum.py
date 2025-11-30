@@ -13,6 +13,7 @@ from collections import defaultdict
 import logging
 
 from ..utils.message import Message
+from .attention_consensus import AttentionVoter, HierarchicalConsensus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -55,6 +56,10 @@ class CorpusColosseum:
         self.embeddings: List[np.ndarray] = []
         self.reset_count = 0
         
+        # Advanced consensus mechanisms
+        self.attention_voter = AttentionVoter()
+        self.hierarchical = HierarchicalConsensus()
+        
         logger.info(f"Corpus Colosseum initialized (dim={embedding_dim}, eps={dbscan_eps})")
     
     def add_message(self, message: Message, embedding: Optional[np.ndarray] = None):
@@ -96,9 +101,13 @@ class CorpusColosseum:
         
         return embedding
     
-    def find_consensus(self) -> Tuple[Optional[Message], Dict[str, Any]]:
+    def find_consensus(self, method: str = "auto", context: Optional[Dict[str, Any]] = None) -> Tuple[Optional[Message], Dict[str, Any]]:
         """
         Apply convergence algorithm to find consensus among messages.
+        
+        Args:
+            method: Consensus method ("auto", "dbscan", "attention", "hierarchical")
+            context: Optional context for decision-making (e.g., urgency)
         
         Returns:
             Tuple of (winning_message, metadata_dict)
@@ -113,6 +122,25 @@ class CorpusColosseum:
             logger.info("Only one message, returning it as consensus")
             return self.messages[0], {"cluster_count": 1, "method": "single"}
         
+        # Auto-select method based on context and message count
+        if method == "auto":
+            if context and context.get("urgency", 0) > 0.7:
+                method = "hierarchical"
+            elif len(self.messages) <= 3:
+                method = "attention"
+            else:
+                method = "dbscan"
+        
+        # Apply selected method
+        if method == "attention":
+            return self._attention_consensus(context)
+        elif method == "hierarchical":
+            return self._hierarchical_consensus(context)
+        else:
+            return self._dbscan_consensus()
+    
+    def _dbscan_consensus(self) -> Tuple[Optional[Message], Dict[str, Any]]:
+        """Original DBSCAN clustering consensus."""
         # Convert embeddings to numpy array
         X = np.array(self.embeddings)
         
@@ -231,3 +259,71 @@ class CorpusColosseum:
     
     def __repr__(self) -> str:
         return f"CorpusColosseum(messages={len(self.messages)}, resets={self.reset_count})"
+    
+    def _attention_consensus(self, context: Optional[Dict[str, Any]] = None) -> Tuple[Optional[Message], Dict[str, Any]]:
+        """
+        Use attention-based voting for consensus.
+        
+        Args:
+            context: Optional context information
+            
+        Returns:
+            Tuple of (winning_message, metadata)
+        """
+        # Compute attention scores
+        attention_scores = self.attention_voter.compute_attention_scores(self.messages)
+        
+        # Weighted vote
+        winner, vote_metadata = self.attention_voter.weighted_vote(self.messages, attention_scores)
+        
+        metadata = {
+            "method": "attention",
+            "total_messages": len(self.messages),
+            **vote_metadata
+        }
+        
+        logger.info(f"Attention consensus: {winner.source} (score={vote_metadata['winning_score']:.2f})")
+        return winner, metadata
+    
+    def _hierarchical_consensus(self, context: Optional[Dict[str, Any]] = None) -> Tuple[Optional[Message], Dict[str, Any]]:
+        """
+        Use hierarchical (fast/slow) consensus.
+        
+        Args:
+            context: Optional context with urgency info
+            
+        Returns:
+            Tuple of (winning_message, metadata)
+        """
+        decision = self.hierarchical.decide(self.messages, context)
+        
+        if decision["level"] == "fast":
+            # Fast decision made
+            return decision["decision"], {
+                "method": "hierarchical_fast",
+                "total_messages": len(self.messages),
+                **decision
+            }
+        elif decision["level"] == "slow":
+            # Delegate to DBSCAN for careful analysis
+            logger.info("Hierarchical: delegating to slow (DBSCAN) thinking")
+            return self._dbscan_consensus()
+        else:
+            # Uncertain - return highest confidence with warning
+            winner = max(self.messages, key=lambda m: m.confidence)
+            return winner, {
+                "method": "hierarchical_uncertain",
+                "total_messages": len(self.messages),
+                "warning": "Low confidence, consider requesting more information",
+                **decision
+            }
+    
+    def update_neuron_performance(self, neuron_name: str, performance_score: float):
+        """
+        Update attention weights based on neuron performance.
+        
+        Args:
+            neuron_name: Name of the neuron
+            performance_score: Score from -1.0 to 1.0
+        """
+        self.attention_voter.update_weights(neuron_name, performance_score)
