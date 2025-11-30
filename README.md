@@ -64,6 +64,32 @@ python3 launch_chappy.py
 # Then open http://localhost:8501
 ```
 
+### REST API
+```bash
+# Install dependencies (includes FastAPI)
+pip install -r requirements.txt
+
+# Launch REST API
+python3 launch_api.py
+# or
+./launch_api.sh
+# API available at http://localhost:8000
+# Interactive docs at http://localhost:8000/docs
+```
+
+### Observability Dashboard
+```bash
+# Install dependencies (includes Streamlit, Plotly)
+pip install -r requirements.txt
+
+# Launch observability dashboard (requires API to be running)
+python3 launch_dashboard.py
+# or
+./launch_dashboard.sh
+# Dashboard available at http://localhost:8501
+# Make sure API server is running on http://localhost:8000
+```
+
 ### Setup
 ```bash
 # Create virtual environment
@@ -141,6 +167,134 @@ python3 chappy_desktop.py
 - Learn from interactions and remember conversations
 - Make executive decisions when faced with uncertainty
 - Express emotions and assess situations
+
+## 🌐 REST API
+
+Integrate Chappy into your applications with a full REST API!
+
+**Quick Launch:**
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch API server
+python3 launch_api.py
+# or
+./launch_api.sh
+
+# API available at http://localhost:8000
+# Interactive docs at http://localhost:8000/docs
+```
+
+**API Endpoints:**
+
+### `POST /api/v1/query`
+Process a query through Chappy's brain.
+
+**Request:**
+```json
+{
+  "query": "What is the meaning of life?",
+  "max_memories": 5,
+  "include_thoughts": false
+}
+```
+
+**Response:**
+```json
+{
+  "response": "My friend, the meaning of life...",
+  "confidence": 0.85,
+  "processing_time": 2.34,
+  "memory_count": 3,
+  "consensus_reached": true
+}
+```
+
+### `GET /api/v1/status`
+Get system status and health information.
+
+### `GET /api/v1/memories`
+Retrieve recent memories from Chappy's memory palace.
+
+### `POST /api/v1/feedback`
+Provide feedback on responses to help Chappy learn.
+
+**Features:**
+- 🚀 **FastAPI** framework with automatic OpenAPI docs
+- 📊 **Real-time processing** through all brain regions
+- 🧠 **Memory integration** for contextual responses
+- 💬 **Thought process** optional detailed output
+- 🔄 **CORS enabled** for web integration
+- 📈 **Performance metrics** and processing times
+
+## 📊 Observability Dashboard
+
+Monitor Chappy's brain activity in real-time with a comprehensive dashboard!
+
+**Quick Launch:**
+```bash
+# Install dependencies (includes Streamlit, Plotly)
+pip install -r requirements.txt
+
+# Launch dashboard (requires API server running)
+python3 launch_dashboard.py
+# or
+./launch_dashboard.sh
+
+# Dashboard available at http://localhost:8501
+```
+
+**Dashboard Features:**
+- 📈 **System Overview**: Uptime, query count, cache performance, response times
+- 🧠 **Brain Activity**: Live neuron activity and consensus confidence trends
+- 💾 **Memory Network**: Memory count, connections, and growth visualization
+- ⚠️ **Health Monitoring**: API connectivity, performance indicators, and alerts
+- 📊 **Interactive Charts**: Real-time Plotly visualizations with live updates
+- 🔄 **Auto-refresh**: Continuous monitoring every 2 seconds
+
+**What You Can Monitor:**
+- Real-time consensus decision processes
+- Memory palace network growth and connectivity
+- Neuron performance and health status
+- Cache hit rates and response times
+- System uptime and query throughput
+- Alert notifications for issues
+
+## 🛠️ Tool Integration
+
+Chappy can now use external tools to enhance his problem-solving capabilities!
+
+**Automatic Tool Usage:**
+Chappy automatically detects when queries require tools and uses them intelligently:
+- **Mathematical queries** → Calculator tool
+- **Search requests** → Web search tool  
+- **Code execution** → Code execution tool
+- **Knowledge queries** → Knowledge base tool
+
+**Available Tools:**
+- **🧮 Calculator**: Symbolic math, equations, and calculations using SymPy
+- **🌐 Web Search**: Current information via DuckDuckGo API
+- **💻 Code Execution**: Safe Python, JavaScript, and Bash execution
+- **📚 Knowledge Base**: Math facts, unit conversions, structured data
+
+**Direct Tool Access:**
+```bash
+# List available tools
+curl http://localhost:8000/api/v1/tools
+
+# Execute a tool directly
+curl -X POST http://localhost:8000/api/v1/tools/execute \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "calculator", "params": {"expression": "2**10 + sqrt(144)"}}'
+```
+
+**Safety Features:**
+- Sandboxed code execution
+- Input validation and sanitization
+- Dangerous operation blocking
+- Timeout protection
+- Restricted system access
 
 ## 📊 Demo Output Example
 

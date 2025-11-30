@@ -19,7 +19,7 @@ from digital_cortex.corpus_colosseum import CorpusColosseum
 from digital_cortex.utils.llm_neuron import NeuronPool
 from digital_cortex.utils.message import Message
 from digital_cortex.feedback.learner import WeightLearner
-from digital_cortex.memory_palace import MemoryPalaceChain
+from digital_cortex.memory_palace import MemoryManager, MemorySystem
 from digital_cortex.sensorium import Sensorium
 from digital_cortex.amygdala import Amygdala
 from digital_cortex.frontal_lobe import FrontalLobe
@@ -45,7 +45,7 @@ class ChappyBrainGUI:
         try:
             self.colosseum = CorpusColosseum(embedding_dim=128, dbscan_eps=0.4)
             self.neuron_pool = NeuronPool()
-            self.memory_palace = MemoryPalaceChain(room_capacity=20)
+            self.memory_palace = MemoryManager(system=MemorySystem.GRAPH, max_nodes=5000)
             self.sensorium = Sensorium()
             self.amygdala = Amygdala()
             self.frontal_lobe = FrontalLobe()
@@ -173,6 +173,10 @@ class ChappyBrainGUI:
             contributing_neurons = metadata.get('contributing_neurons', [winner.source])
             outcome_score = 0.7  # Assume positive interaction
             self.learner.update_contributing_neurons(contributing_neurons, outcome_score)
+            
+            # Update attention weights for future consensus
+            for neuron in contributing_neurons:
+                self.colosseum.update_neuron_performance(neuron, outcome_score)
 
             # Step 7: Memory storage
             outcome_data = {
@@ -227,59 +231,11 @@ class ChappyBrainGUI:
         return status
     def retrieve_relevant_memories(self, current_input: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Retrieve memories relevant to the current input."""
-        relevant_memories = []
-
         if not self.memory_palace:
-            return relevant_memories
+            return []
 
-        try:
-            # Get recent memories from the current room
-            summary = self.memory_palace.get_chain_summary()
-            if summary['total_memories'] == 0:
-                return relevant_memories
-
-            # For now, get the most recent memories
-            # TODO: Implement semantic similarity search
-            recent_memories = []
-            current_room = self.memory_palace.current_room
-
-            # Get memories from current room (simplified approach)
-            if hasattr(current_room, 'memories'):
-                for coord, memory_data in list(current_room.memories.items())[-limit:]:
-                    memory_info = {
-                        "address": f"room_{current_room.room_id}_{coord}",
-                        "content": memory_data.get("content", ""),
-                        "outcome": memory_data.get("outcome_data", {}),
-                        "timestamp": memory_data.get("timestamp", ""),
-                        "relevance_score": 0.5  # Placeholder for future semantic matching
-                    }
-                    recent_memories.append(memory_info)
-
-            # Simple keyword matching for relevance
-            input_words = set(current_input.lower().split())
-            for memory in recent_memories:
-                memory_content = memory["content"].lower()
-                memory_words = set(memory_content.split())
-
-                # Calculate simple overlap score
-                overlap = len(input_words.intersection(memory_words))
-                total_words = len(input_words.union(memory_words))
-
-                if total_words > 0:
-                    relevance = overlap / total_words
-                    memory["relevance_score"] = relevance
-
-                    # Include memories with some relevance
-                    if relevance > 0.1 or len(relevant_memories) < 3:  # Always include at least 3 recent memories
-                        relevant_memories.append(memory)
-
-            # Sort by relevance and return top memories
-            relevant_memories.sort(key=lambda x: x["relevance_score"], reverse=True)
-            return relevant_memories[:limit]
-
-        except Exception as e:
-            self.add_thought("⚠️", f"Memory retrieval error: {e}", "system")
-            return relevant_memories
+        # Use the memory manager's retrieve method
+        return self.memory_palace.retrieve_relevant_memories(current_input, limit)
         """Gracefully shut down Chappy's brain components."""
         self.add_thought("😴", "Initiating shutdown sequence...", "system")
 

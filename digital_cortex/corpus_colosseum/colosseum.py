@@ -318,6 +318,10 @@ class CorpusColosseum:
                 **decision
             }
     
+    def get_attention_weights(self) -> Dict[str, float]:
+        """Get current attention weights for all neurons."""
+        return self.attention_voter.get_weights()
+    
     def update_neuron_performance(self, neuron_name: str, performance_score: float):
         """
         Update attention weights based on neuron performance.
